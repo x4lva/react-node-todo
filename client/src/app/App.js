@@ -1,12 +1,12 @@
+import React, {Component} from "react"
 import './App.css';
-import "../../public/assets/css/bootstarp/bootstrap.min.css"
 
-function App() {
-  return (
-    <div className="App">
-        Start
-    </div>
-  );
+export default class App extends Component{
+    render() {
+        return (
+            <div className="App">
+                Start
+            </div>
+        )
+    }
 }
-
-export default App;
