@@ -1,0 +1,48 @@
+.navbar-nav a{
+    text-decoration: none;
+    color: #6c757d;
+    transition: .3s ease-in-out;
+}
+.navbar-nav .nav-item-current{
+    color: #fff!important;
+    box-shadow: inset 5px 0px 0px 0px #fff;
+}
+.header-nav{
+    background: #000;
+    padding: 15px 0 !important;
+}
+.nav-item i{
+    margin-right: 7px;
+}
+.navbar-nav a:hover {
+    color: #adadad;
+}
+.sidebar{
+    min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 17%;
+    background: #000;
+}
+.sidebar-header{
+    height: 66px;
+}
+.nav-item a{
+    font-size: 18px;
+    padding: 10px 20px;
+}
+.nav-item{
+    margin: 10px 0;
+}
+.nav-item span {
+    width: 50px;
+    text-align: center;
+    display: inline-block;
+}
+.sidebar-logout{
+    font-size: 18px;
+}
+.sidebar-logout:hover{
+    cursor: pointer;
+}

@@ -1,0 +1,15 @@
+.toast {
+    font-family: inherit !important;
+}
+.toast-success {
+    color: #fff !important;
+    background: #000 !important;
+}
+.toast-error {
+    color: #fff !important;
+    background: #6c757d  !important;
+}
+main{
+    width: 83%;
+    background: #ECECF0;
+}
