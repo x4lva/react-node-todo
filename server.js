@@ -33,3 +33,4 @@ server.listen(PORT, () => {
 
 app.use("/board", require("./routes/Board"))
 app.use("/user", require("./routes/User"))
+app.use("/todo", require("./routes/Todo"))

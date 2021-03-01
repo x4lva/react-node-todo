@@ -7,6 +7,7 @@ import jwtDecode from "jwt-decode";
 import UsersList from "../../components/UserList/UsersList";
 import {ToastsContainer, ToastsStore} from 'react-toasts';
 import {Modal} from "react-bootstrap";
+import BoardBody from "../../components/BoardBody/BoardBody";
 
 export default class Board extends Component{
 
@@ -78,7 +79,7 @@ export default class Board extends Component{
     render() {
         return(
             <>
-                <div className="board-header border-bottom d-flex justify-content-center pt-2 pb-2">
+                <div className="board-header border-bottom d-flex justify-content-center pt-2 pb-2 shadow">
                     <div className="col-11 col-md-8 col-lg-11 d-flex justify-content-between">
                         <div className="board-header-title d-flex align-items-center">
                             <h5 className="text-dark">
@@ -93,10 +94,9 @@ export default class Board extends Component{
                         </div>
                     </div>
                 </div>
-                <div className="container-fluid">
-
-                    <div className="col-12 col-md-8 col-lg-8">
-
+                <div className="mt-4 d-flex justify-content-center">
+                    <div className="col-12 col-md-8 col-lg-11">
+                        <BoardBody board={this.state.board}/>
                     </div>
                 </div>
                 <ToastsContainer store={ToastsStore}/>

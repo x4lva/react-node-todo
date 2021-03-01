@@ -1,7 +1,7 @@
 import axios from "axios";
 
-export const createBoard = (boardName, userId) => {
-    return axios
+export const createBoard = async (boardName, userId) => {
+    return await axios
         .post("http://localhost:3000/board/create", {boardName, userId})
         .then(response => {
             console.log(response.data.status)
@@ -11,8 +11,8 @@ export const createBoard = (boardName, userId) => {
         })
 }
 
-export const getBoardList = () => {
-    return axios
+export const getBoardList = async () => {
+    return await axios
         .post("http://localhost:3000/board/list", {})
         .then(response => {
             return response.data
@@ -22,8 +22,8 @@ export const getBoardList = () => {
         })
 }
 
-export const getBoardData = (boardId) => {
-    return axios
+export const getBoardData = async (boardId) => {
+    return await axios
         .get(`http://localhost:3000/board/data/${boardId}`)
         .then(response => {
             return response.data
@@ -33,8 +33,8 @@ export const getBoardData = (boardId) => {
         })
 }
 
-export const addBoardMember = (boardId, userId) => {
-    return axios
+export const addBoardMember = async (boardId, userId) => {
+    return await axios
         .post("http://localhost:3000/board/add/member", {boardId, userId})
         .then(response => {
             if (response.data.status){

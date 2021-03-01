@@ -13,6 +13,7 @@ import Reports from "../pages/Reports/reports";
 import Calendar from "../pages/Calendar/calendar";
 import Boards from "../pages/Boards/boards";
 import Sidebar from "../components/Sidebar/Sidebar";
+import {ToastsContainer} from "react-toasts";
 
 export default class App extends Component{
 

@@ -84,8 +84,6 @@ user.post("/register", (req, res) => {
 })
 
 user.post("/data", (req, res) => {
-    console.log(req.body)
-
     User.findOne({_id: req.body.userId})
         .then((user) => {
             res.json(user)

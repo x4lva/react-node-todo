@@ -1,0 +1,35 @@
+.board-todo-list-item{
+    width: 23%;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    border-radius: 0.25rem;
+    min-height: 200px;
+    margin-bottom: 25px;
+}
+.board-todo-list-item-header{
+    font-size: 19px;
+}
+.todo-list-control{
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #000;
+    color: #fff;
+    font-size: 12px;
+    border-radius: 50%;
+    margin-left: 5px;
+}
+.board-todo-list-item-header-title{
+    border: 0;
+    width: 100%;
+    outline: none;
+    background: transparent;
+    border-radius: 0.25rem;
+    transition: .3s ease-in-out;
+}
+.board-todo-list-item-header-title:focus{
+    /*background: #ECECF0;*/
+}

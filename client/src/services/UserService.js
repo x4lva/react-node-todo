@@ -1,7 +1,7 @@
 import axios from "axios";
 
-export const loginUser = (userEmail, userPassword) => {
-    return axios
+export const loginUser = async (userEmail, userPassword) => {
+    return await axios
         .post("http://localhost:3000/user/login", {userEmail, userPassword})
         .then(response => {
             if (response.data.error){
@@ -16,8 +16,8 @@ export const loginUser = (userEmail, userPassword) => {
         })
 }
 
-export const registerUser = (userName, userEmail, userPassword) => {
-    return axios
+export const registerUser = async (userName, userEmail, userPassword) => {
+    return await axios
         .post("http://localhost:3000/user/register", {userName, userEmail, userPassword})
         .then(response => {
             if (response.data.error){
@@ -31,8 +31,8 @@ export const registerUser = (userName, userEmail, userPassword) => {
         })
 }
 
-export const connectBoard = (userId, boardId) => {
-    return axios
+export const connectBoard = async (userId, boardId) => {
+    return await axios
         .post("http://localhost:3000/user/connect", {userId, boardId})
         .then(response => {
             console.log(response.data)
@@ -42,8 +42,8 @@ export const connectBoard = (userId, boardId) => {
         })
 }
 
-export const getUserData = (userId) => {
-    return axios
+export const getUserData = async (userId) => {
+    return await axios
         .post("http://localhost:3000/user/data ", {userId})
         .then(response => {
            return response.data

@@ -9,7 +9,6 @@ const User = require('../schema/User')
 board.use(cors())
 
 board.post('/create', (req, res) => {
-    console.log(req.body)
     const boardData = {
         name: req.body.boardName,
         creator: req.body.userId,
@@ -41,8 +40,6 @@ board.get('/data/:id', (req, res) => {
 })
 
 board.post('/add/member', (req, res) => {
-
-
     if (mongoose.Types.ObjectId.isValid(req.body.userId)){
         User.findById(req.body.userId)
             .then(user => {
@@ -64,8 +61,6 @@ board.post('/add/member', (req, res) => {
     }else{
         res.json({status: 501, message: 'Invalid user id'})
     }
-
-
 })
 
 

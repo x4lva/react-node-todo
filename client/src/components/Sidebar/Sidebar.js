@@ -48,7 +48,7 @@ class Sidebar extends Component{
                             </NavLink>
                         </li>
                     </ul>
-                    <div onClick={this.onLogout} className="sidebar-logout text-dark bg-white p-2 fw-bold text-uppercase d-flex justify-content-center align-items-center">
+                    <div onClick={this.onLogout} className="m-3 rounded-2 sidebar-logout text-dark bg-white p-2 fw-bold text-uppercase d-flex justify-content-center align-items-center">
                         Logout
                     </div>
                 </div>
