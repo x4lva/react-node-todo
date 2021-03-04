@@ -31,6 +31,24 @@ server.listen(PORT, () => {
     console.log('Server is running on port: ' + PORT)
 })
 
+io.on("connection", (socket) => {
+    socket.on("createTodo", (res) => {
+        io.emit("updateTodos", {type: "TODO_CREATE", user: res.user, boardName: res.boardName})
+    })
+
+    socket.on("deleteTodo", (res) => {
+        io.emit("updateTodos", {type: "TODO_DELETE", user: res.user, boardName: res.boardName})
+    })
+
+    socket.on("addUser", () => {
+        io.emit("updateUsers")
+    })
+
+    socket.on("todoChanged", () => {
+        io.emit("updateTodos", {type: "TODO_CHANGED"})
+    })
+})
+
 app.use("/board", require("./routes/Board"))
 app.use("/user", require("./routes/User"))
 app.use("/todo", require("./routes/Todo"))

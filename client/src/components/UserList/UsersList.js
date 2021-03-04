@@ -2,7 +2,6 @@ import React from "react"
 import "./UsersList.css"
 
 export default function UsersList(props){
-
     const userList = props.users.slice(0,4).map(el => {
         return <li key={el._id} className="users-list-item">{el.name.slice(0,2).toUpperCase()}</li>
     })

@@ -67,4 +67,20 @@ todo.post("/update", (req, res) => {
 })
 
 
+
+todo.post("/delete", (req, res) => {
+
+    const {todoId} = req.body
+
+
+    Todo.findByIdAndDelete(todoId,{}, (doc) => {})
+        .then(todo => {
+            res.status(200).json({message: "Todo has been delete successfully"})
+        })
+        .catch(err => {
+            console.log(err)
+            res.send('error: ' + err)
+        })
+})
+
 module.exports = todo

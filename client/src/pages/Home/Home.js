@@ -72,7 +72,7 @@ export default class Home extends Component{
                     {
                         this.state.boardsList.map(el => {
                             const link = `/board/${el}`
-                            return <li><Link to={link} key={el}>{el}</Link></li>
+                            return <li key={el}><Link to={link} key={el}>{el}</Link></li>
                         })
                     }
                     {

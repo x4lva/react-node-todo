@@ -1,11 +1,14 @@
-.board-todo-list-item{
-    width: 23%;
+.board-todo-list-item {
     background: #fff;
+    border-radius: 0.25rem;
+    margin-bottom: 25px;
+    position: relative;
     display: flex;
     flex-direction: column;
-    border-radius: 0.25rem;
-    min-height: 200px;
-    margin-bottom: 25px;
+    height: fit-content;
+    transition: .3s;
+    width: 23%;
+    margin-right: 2.6666667%;
 }
 .board-todo-list-item-header{
     font-size: 19px;
@@ -22,6 +25,9 @@
     border-radius: 50%;
     margin-left: 5px;
 }
+.todo-list-control:hover {
+    cursor: pointer;
+}
 .board-todo-list-item-header-title{
     border: 0;
     width: 100%;
@@ -32,4 +38,44 @@
 }
 .board-todo-list-item-header-title:focus{
     /*background: #ECECF0;*/
+}
+.board-todo-list-item-actions{
+    position: absolute;
+    top: 100px;
+    right: 0px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    background: #000;
+    color: #fff;
+    transition: .3s;
+    visibility: hidden;
+    opacity: 0;
+}
+
+.list-item-actions-active{
+    visibility: visible;
+    right: 0px;
+    top: 49px;
+    opacity: 1;
+    z-index: 2;
+}
+.board-todo-list-item-action:hover{
+    cursor: pointer;
+}
+.board-todo-list-item-add{
+    visibility: hidden;
+    transition: .3s;
+    opacity: 0;
+    position: absolute;
+    bottom: 1000px;
+}
+.todo-list-add-active{
+    visibility: visible;
+    opacity: 1;
+    top: 0;
+    position: relative;
+}
+.board-todo-list-item-add textarea{
+    resize: none;
 }

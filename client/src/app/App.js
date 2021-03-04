@@ -1,8 +1,6 @@
 import React, {Component} from "react"
 import {BrowserRouter} from 'react-router-dom'
 import {Switch, Route, Redirect} from 'react-router-dom'
-import openSocket from "socket.io-client";
-import HeaderMenu from "../components/Sidebar/Sidebar"
 
 import './App.css';
 import Home from "../pages/Home/Home";
@@ -13,12 +11,8 @@ import Reports from "../pages/Reports/reports";
 import Calendar from "../pages/Calendar/calendar";
 import Boards from "../pages/Boards/boards";
 import Sidebar from "../components/Sidebar/Sidebar";
-import {ToastsContainer} from "react-toasts";
 
 export default class App extends Component{
-
-
-
     render() {
         const loginRegLink = (
             <Switch>

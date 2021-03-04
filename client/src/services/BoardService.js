@@ -47,3 +47,14 @@ export const addBoardMember = async (boardId, userId) => {
             console.log(e)
         })
 }
+
+export const getBoardUsers = async (boardId) => {
+    return await axios
+        .post("http://localhost:3000/board/get/users", {boardId})
+        .then(response => {
+            return response.data
+        })
+        .catch(e => {
+            console.log(e)
+        })
+}

@@ -63,5 +63,23 @@ board.post('/add/member', (req, res) => {
     }
 })
 
+board.post('/get/users',  (req, res) => {
+
+     const {boardId} = req.body
+
+     Board.findById(boardId)
+        .then(board =>  {
+             const users = board.users.map(user => {
+                 return User.findById(user).then(res => { return {_id: res._id,name: res.name, email: res.email}})
+            })
+            Promise.all(users)
+                .then(response => {
+                    res.json(response)
+                })
+        })
+        .catch(err => {
+            res.send('error: ' + err)
+        })
+})
 
 module.exports = board

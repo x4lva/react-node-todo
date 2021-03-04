@@ -1,13 +1,14 @@
 import React, {Component} from "react"
 
 import "./board.css"
-import {addBoardMember, getBoardData} from "../../services/BoardService";
+import {addBoardMember, getBoardData, getBoardUsers} from "../../services/BoardService";
 import {getUserData} from "../../services/UserService";
 import jwtDecode from "jwt-decode";
 import UsersList from "../../components/UserList/UsersList";
 import {ToastsContainer, ToastsStore} from 'react-toasts';
 import {Modal} from "react-bootstrap";
 import BoardBody from "../../components/BoardBody/BoardBody";
+import socket from "../../utilities/OpenSocket";
 
 export default class Board extends Component{
 
@@ -26,29 +27,46 @@ export default class Board extends Component{
         this.toggleAddMemberModal = this.toggleAddMemberModal.bind(this)
         this.onAddMemberIdChange = this.onAddMemberIdChange.bind(this)
         this.boardAddMemberModal = this.boardAddMemberModal.bind(this)
+        this.updateBoard = this.updateBoard.bind(this)
     }
 
     componentDidMount() {
         this.updateBoard()
+        socket.on("updateTodos", (res) => {
+            this.updateTodos()
+            if (res.type === "TODO_CREATE"){
+                ToastsStore.success(`User ${res.user} created board ${res.boardName}`)
+            }
+            if (res.type === "TODO_DELETE"){
+                ToastsStore.success(`User ${res.user} deleted board ${res.boardName}`)
+            }
+        })
+        socket.on("updateUsers", (res) => {
+            this.updateUsers()
+        })
     }
 
-    updateBoard(){
-        getBoardData(this.props.match.params.id)
-            .then(board => {
+    updateUsers(){
+        getBoardUsers(this.state.board._id)
+            .then(res => {
+                this.setState({
+                    boardUsers: res
+                })
+            })
+    }
+
+    async updateTodos(){
+        await getBoardData(this.props.match.params.id)
+            .then(board  => {
                 this.setState({
                     board: board
                 })
-                this.setState({
-                    boardUsers: []
-                })
-                this.state.board.users.forEach(el => {
-                    getUserData(el).then(user => {
-                        this.setState((state) => {
-                            return {boardUsers: [...state.boardUsers, user]}
-                        })
-                    })
-                })
             })
+    }
+
+    async updateBoard(){
+        await this.updateTodos()
+        this.updateUsers()
     }
 
     toggleAddMemberModal(){
@@ -63,17 +81,17 @@ export default class Board extends Component{
         })
     }
 
-    boardAddMemberModal(){
-        addBoardMember(this.state.board._id, this.state.boardAddMemberId)
+    async boardAddMemberModal(){
+        await addBoardMember(this.state.board._id, this.state.boardAddMemberId)
             .then(res => {
                 if (res.status === 200){
+                    socket.emit("addUser")
                     ToastsStore.success(res.message)
                 }else {
                     ToastsStore.error(res.message)
                 }
             })
         this.toggleAddMemberModal()
-        this.updateBoard()
     }
 
     render() {
@@ -96,7 +114,7 @@ export default class Board extends Component{
                 </div>
                 <div className="mt-4 d-flex justify-content-center">
                     <div className="col-12 col-md-8 col-lg-11">
-                        <BoardBody board={this.state.board}/>
+                        <BoardBody updateBoard={this.updateBoard} board={this.state.board}/>
                     </div>
                 </div>
                 <ToastsContainer store={ToastsStore}/>

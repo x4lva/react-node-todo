@@ -4,6 +4,8 @@ import TodoList from "../TodoList/TodoList";
 import {createTodo, getBoardTodos} from "../../services/TodoService";
 import jwtDecode from "jwt-decode";
 import {ToastsContainer, ToastsStore} from "react-toasts";
+import socket from "../../utilities/OpenSocket";
+import ScrollContainer from "react-indiana-drag-scroll";
 
 export default class BoardBody extends Component{
 
@@ -14,6 +16,8 @@ export default class BoardBody extends Component{
         this.handleClickOutside = this.handleClickOutside.bind(this);
         this.onTodoCreate = this.onTodoCreate.bind(this);
         this.onTodoNameChange = this.onTodoNameChange.bind(this);
+
+        this.updateBoard = () => this.props.updateBoard
 
         this.state = {
             boardData: this.props.board,
@@ -27,19 +31,19 @@ export default class BoardBody extends Component{
         document.addEventListener('mousedown', this.handleClickOutside);
     }
 
+    componentWillUnmount() {
+        document.removeEventListener('mousedown', this.handleClickOutside);
+    }
+
     componentDidUpdate(prevProps,prevState) {
         if (prevProps.board !== this.props.board){
             getBoardTodos(this.props.board._id).then(res => {
-                    this.setState({
+                    this.setState ({
                         todoList: res
                     })
                 }
             )
         }
-    }
-
-    componentWillUnmount() {
-        document.removeEventListener('mousedown', this.handleClickOutside);
     }
 
     toggleBoardCreate(state){
@@ -49,16 +53,15 @@ export default class BoardBody extends Component{
     }
 
     onTodoCreate(e){
-        console.log(e.button)
         if (e.key === "Enter" || e.button == 0){
             if (this.state.createTodoName.length !== 0){
                 createTodo(this.state.createTodoName, this.props.board._id, jwtDecode(localStorage.usertoken)._id)
                     .then(res => {
                         if (res === 200){
+                            socket.emit("createTodo", {user: jwtDecode(localStorage.usertoken).name, boardName: this.state.createTodoName})
                             this.setState({
                                 createTodoName: ''
                             })
-                            ToastsStore.success("List has been created successfully")
                         }
                     })
             }else{
@@ -88,7 +91,7 @@ export default class BoardBody extends Component{
         }
 
         const todoLists = this.state.todoList.map(el => {
-            return <TodoList todo={el._id} />
+            return <TodoList dragable={false} key={el._id} todo={el._id} />
         })
 
         return(
@@ -107,15 +110,13 @@ export default class BoardBody extends Component{
                         </div>
                     </div>
                 </div>
-                <div className="board-todo-list d-flex justify-content-between flex-wrap mt-3">
-
+                <ScrollContainer onClick={e => console.log(e.target)} ignoreElements=".board-todo-list-item, #createBoard" stopPropagation={true} horizontal={true} hideScrollbars={false} vertical={false} className="scroll-container d-flex">
                     {todoLists}
-
                     <div className={createBoardClass} id="createBoard" onClick={() => this.toggleBoardCreate(true)}>
                         <input onKeyDown={this.onTodoCreate} value={this.state.createTodoName} onChange={this.onTodoNameChange} placeholder="List name" className="mb-3 form-control" type="text"/>
                         <div onClick={this.onTodoCreate} className="btn btn-dark">Save</div>
                     </div>
-                </div>
+                </ScrollContainer>
                 <ToastsContainer store={ToastsStore}/>
             </div>
         )
