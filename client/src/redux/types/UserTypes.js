@@ -1,0 +1,2 @@
+export const UPDATE_USER_DATA = "UPDATE_USER_DATA"
+export const CREATE_USER = "CREATE_USER"

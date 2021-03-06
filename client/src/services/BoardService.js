@@ -58,3 +58,14 @@ export const getBoardUsers = async (boardId) => {
             console.log(e)
         })
 }
+
+export const updateBoardData = async (boardData) => {
+    return await axios
+        .post("http://localhost:3000/board/update", {boardData})
+        .then(response => {
+            return response
+        })
+        .catch(e => {
+            console.log(e)
+        })
+}

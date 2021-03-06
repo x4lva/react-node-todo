@@ -12,9 +12,7 @@ board.post('/create', (req, res) => {
     const boardData = {
         name: req.body.boardName,
         creator: req.body.userId,
-        users: [req.body.userId],
-        created_at: new Date(),
-        updated_at: new Date()
+        users: [req.body.userId]
     }
 
     Board.create(boardData)
@@ -70,7 +68,7 @@ board.post('/get/users',  (req, res) => {
      Board.findById(boardId)
         .then(board =>  {
              const users = board.users.map(user => {
-                 return User.findById(user).then(res => { return {_id: res._id,name: res.name, email: res.email}})
+                 return User.findById({_id: user}).then(res => { return {_id: res._id,name: res.name, email: res.email}})
             })
             Promise.all(users)
                 .then(response => {
@@ -78,6 +76,20 @@ board.post('/get/users',  (req, res) => {
                 })
         })
         .catch(err => {
+            res.send('error: ' + err)
+        })
+})
+
+board.post('/update',  (req, res) => {
+    let {boardData} = req.body
+
+    Board.findByIdAndUpdate(boardData._id, {$addToSet: {users: boardData.users}, ...boardData}, {new: true})
+        .then(board =>  {
+            console.log(board)
+            res.status(200).json(board)
+        })
+        .catch(err => {
+            console.log(err)
             res.send('error: ' + err)
         })
 })

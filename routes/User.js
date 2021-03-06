@@ -52,12 +52,12 @@ user.post("/login", (req, res) => {
 })
 
 user.post("/register", (req, res) => {
+    console.log(req.body)
     const userData = {
         name: req.body.userName,
         email: req.body.userEmail,
         password: req.body.userPassword,
-        boards: [],
-        created_at: new Date()
+        boards: []
     }
     User.findOne({
         email: req.body.userEmail
@@ -68,6 +68,7 @@ user.post("/register", (req, res) => {
                 userData.password = hash
                 User.create(userData)
                     .then(user => {
+                        console.log(user)
                         res.json({ status: 200 })
                     })
                     .catch(err => {
@@ -92,5 +93,21 @@ user.post("/data", (req, res) => {
             res.send('error: ' + err)
         })
 })
+
+
+user.post("/update", async (req, res) => {
+
+    const {userData} = req.body
+
+    User.findByIdAndUpdate(userData._id, {$addToSet: {boards: userData.boards}, userData}, {})
+        .then((user) => {
+            Board.findByIdAndUpdate({_id: userData.boards.slice(-1)[0]}, {$addToSet: {users: user._id}}, {})
+            res.status(200).json(user)
+        })
+        .catch(err => {
+            res.send('error: ' + err)
+        })
+})
+
 
 module.exports = user

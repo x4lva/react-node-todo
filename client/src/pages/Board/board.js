@@ -9,89 +9,38 @@ import {ToastsContainer, ToastsStore} from 'react-toasts';
 import {Modal} from "react-bootstrap";
 import BoardBody from "../../components/BoardBody/BoardBody";
 import socket from "../../utilities/OpenSocket";
+import {connect} from "react-redux"
+import {updateUserDataState} from "../../redux/actions/UserActions";
+import {
+    changeBoardAddMemberId,
+    getBoardState,
+    toggleBoardAddMember, updateBoardDataState,
+} from "../../redux/actions/BoardActions";
 
-export default class Board extends Component{
+class Board extends Component{
 
     constructor(props) {
         super(props);
 
-        this.state = {
-            board: {
-                users: []
-            },
-            boardAddMember: false,
-            boardAddMemberId: '',
-            boardUsers: []
-        }
-
-        this.toggleAddMemberModal = this.toggleAddMemberModal.bind(this)
         this.onAddMemberIdChange = this.onAddMemberIdChange.bind(this)
+        this.toggleAddMemberModal = this.toggleAddMemberModal.bind(this)
         this.boardAddMemberModal = this.boardAddMemberModal.bind(this)
-        this.updateBoard = this.updateBoard.bind(this)
     }
 
     componentDidMount() {
-        this.updateBoard()
-        socket.on("updateTodos", (res) => {
-            this.updateTodos()
-            if (res.type === "TODO_CREATE"){
-                ToastsStore.success(`User ${res.user} created board ${res.boardName}`)
-            }
-            if (res.type === "TODO_DELETE"){
-                ToastsStore.success(`User ${res.user} deleted board ${res.boardName}`)
-            }
-        })
-        socket.on("updateUsers", (res) => {
-            this.updateUsers()
-        })
-    }
-
-    updateUsers(){
-        getBoardUsers(this.state.board._id)
-            .then(res => {
-                this.setState({
-                    boardUsers: res
-                })
-            })
-    }
-
-    async updateTodos(){
-        await getBoardData(this.props.match.params.id)
-            .then(board  => {
-                this.setState({
-                    board: board
-                })
-            })
-    }
-
-    async updateBoard(){
-        await this.updateTodos()
-        this.updateUsers()
+        this.props.getBoardState(this.props.match.params.id)
     }
 
     toggleAddMemberModal(){
-        this.setState({
-            boardAddMember: !this.state.boardAddMember
-        })
+        this.props.toggleBoardAddMember()
     }
 
     onAddMemberIdChange(e){
-        this.setState({
-            boardAddMemberId: e.target.value
-        })
+        this.props.changeBoardAddMemberId(e.target.value)
     }
 
-    async boardAddMemberModal(){
-        await addBoardMember(this.state.board._id, this.state.boardAddMemberId)
-            .then(res => {
-                if (res.status === 200){
-                    socket.emit("addUser")
-                    ToastsStore.success(res.message)
-                }else {
-                    ToastsStore.error(res.message)
-                }
-            })
-        this.toggleAddMemberModal()
+    boardAddMemberModal(){
+        this.props.updateBoardDataState({name: this.props.boardAddMemberData.boardAddMemberId})
     }
 
     render() {
@@ -101,12 +50,12 @@ export default class Board extends Component{
                     <div className="col-11 col-md-8 col-lg-11 d-flex justify-content-between">
                         <div className="board-header-title d-flex align-items-center">
                             <h5 className="text-dark">
-                                {this.state.board.name}
+                                {this.props.boardData.name}
                             </h5>
-                            <span className="ms-2 badge bg-secondary p-2">Sprint {this.state.board.users.length}</span>
+                            <span className="ms-2 badge bg-secondary p-2">Sprint {this.props.boardData.users.length}</span>
                         </div>
                         <div className="board-header-info d-flex align-items-center">
-                            <UsersList users={this.state.boardUsers}/>
+                            <UsersList users={this.props.boardUsersData}/>
                             <div className="h-100 vertical-dec m-3"></div>
                             <div onClick={this.toggleAddMemberModal} className="btn btn-outline-dark">New Member</div>
                         </div>
@@ -114,17 +63,17 @@ export default class Board extends Component{
                 </div>
                 <div className="mt-4 d-flex justify-content-center">
                     <div className="col-12 col-md-8 col-lg-11">
-                        <BoardBody updateBoard={this.updateBoard} board={this.state.board}/>
+                        <BoardBody updateBoard={this.updateBoard} board={this.props.boardData}/>
                     </div>
                 </div>
                 <ToastsContainer store={ToastsStore}/>
-                <Modal show={this.state.boardAddMember} onHide={this.toggleAddMemberModal}>
+                <Modal show={this.props.boardAddMemberData.boardAddMember} onHide={this.toggleAddMemberModal}>
                     <div className="modal-header">
                         <h5 className="modal-title">Add new board member</h5>
                         <button type="button" className="btn-close" onClick={this.toggleAddMemberModal} aria-label="Close"></button>
                     </div>
                     <div className="modal-body">
-                        <input placeholder="UserID" className="form-control" value={this.state.boardAddMemberId} onChange={this.onAddMemberIdChange} type="text"/>
+                        <input placeholder="UserID" className="form-control" value={this.props.boardAddMemberData.boardAddMemberId} onChange={this.onAddMemberIdChange} type="text"/>
                     </div>
                     <div className="modal-footer">
                         <div className="btn btn-secondary" onClick={this.toggleAddMemberModal}>
@@ -139,3 +88,26 @@ export default class Board extends Component{
         )
     }
 }
+
+const mapStateToProps = (state) => {
+    console.log(state.boardState.boardUsersData)
+    return {
+        userData: state.userState.userData,
+        boardData: state.boardState.boardData,
+        boardUsersData: state.boardState.boardUsersData,
+        boardAddMemberData: {
+            boardAddMember: state.boardState.boardAddMember,
+            boardAddMemberId: state.boardState.boardAddMemberId,
+        }
+    }
+}
+
+const mapDispatchToProps = {
+    updateUserDataState,
+    updateBoardDataState,
+    getBoardState,
+    toggleBoardAddMember,
+    changeBoardAddMemberId
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Board)

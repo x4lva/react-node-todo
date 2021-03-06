@@ -7,21 +7,14 @@ const BoardScheme = new Schema({
         required: true
     },
     creator: {
-        type: String,
+        type: mongoose.Types.ObjectId,
         required: true
     },
     users: {
-        type: [String],
+        type: [mongoose.Types.ObjectId],
         default: []
-    },
-    created_at: {
-        type: Date,
-        default: Date.now
-    },
-    updated_at: {
-        type: Date,
-        default: Date.now
+
     }
-})
+}, {timestamps: true})
 
 module.exports = Board = mongoose.model('board', BoardScheme)

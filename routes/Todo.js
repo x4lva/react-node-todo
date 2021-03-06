@@ -37,9 +37,7 @@ todo.post("/create", (req, res) => {
         name: todoName,
         board_id: boardId,
         creator: userId,
-        users: [userId],
-        created_at: new Date(),
-        updated_at: new Date()
+        users: [userId]
     }
 
     Todo.create(todoData)

@@ -7,21 +7,13 @@ const TodoItemCommentSchema = new Schema({
         required: true
     },
     author: {
-        type: String,
+        type: mongoose.Types.ObjectId,
         default: true
     },
     todo_id: {
-        type: String,
+        type: mongoose.Types.ObjectId,
         required: true
-    },
-    users: {
-        type: [String],
-        default: []
-    },
-    created_at: {
-        type: Date,
-        default: Date.now
     }
-})
+}, {timestamps: true})
 
 module.exports = TodoItemComment = mongoose.model('todoItem', TodoItemCommentSchema)

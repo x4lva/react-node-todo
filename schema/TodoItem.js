@@ -11,7 +11,7 @@ const TodoItemSchema = new Schema({
         default: ''
     },
     board_id: {
-        type: String,
+        type: mongoose.Types.ObjectId,
         required: true
     },
     creator: {
@@ -19,17 +19,12 @@ const TodoItemSchema = new Schema({
         required: true
     },
     users: {
-        type: [String],
+        type: [{
+            type: mongoose.Types.ObjectId,
+            unique: true
+        }],
         default: []
-    },
-    created_at: {
-        type: Date,
-        default: Date.now
-    },
-    updated_at: {
-        type: Date,
-        default: Date.now
     }
-})
+}, {timestamps: true})
 
 module.exports = TodoItem = mongoose.model('todoItem', TodoItemSchema)

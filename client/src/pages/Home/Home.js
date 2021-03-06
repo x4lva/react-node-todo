@@ -1,36 +1,28 @@
 import React, {Component} from "react"
-import openSocket from "socket.io-client"
 import jwtDecode from "jwt-decode";
 
 import "./home.css"
-import {createBoard, getBoardList} from "../../services/BoardService";
-import {connectBoard, getUserBoards, getUserData} from "../../services/UserService";
+import {createBoard} from "../../services/BoardService";
 import {Link} from "react-router-dom";
+import {connect} from "react-redux";
 
-export default class Home extends Component{
+import {updateUserDataState} from "../../redux/actions/UserActions";
+import {updateBoardDataState} from "../../redux/actions/BoardActions";
+
+class Home extends Component{
 
     constructor(props) {
         super(props);
 
         this.state = {
             boardName: '',
-            connectBoardId: '',
-            boardsList: []
+            connectBoardId: ''
         }
 
         this.createBoard = this.createBoard.bind(this)
         this.updateBoardName = this.updateBoardName.bind(this)
         this.connectBoard = this.connectBoard.bind(this)
         this.updateConnectBoardId = this.updateConnectBoardId.bind(this)
-    }
-
-    componentDidMount() {
-        getUserData(jwtDecode(localStorage.usertoken)._id)
-            .then((boards) => {
-                this.setState({
-                    boardsList: boards.boards
-                })
-        })
     }
 
     createBoard(e){
@@ -51,7 +43,7 @@ export default class Home extends Component{
     }
 
     connectBoard(){
-        connectBoard(jwtDecode(localStorage.usertoken)._id, this.state.connectBoardId)
+        this.props.updateUserDataState({boards: [...this.props.userData.boards, this.state.connectBoardId]})
     }
 
     render() {
@@ -69,17 +61,28 @@ export default class Home extends Component{
                         Connect Board
                     </div>
                 <div>
+                    <ol>
                     {
-                        this.state.boardsList.map(el => {
+                        this.props.userData.boards.map(el => {
                             const link = `/board/${el}`
                             return <li key={el}><Link to={link} key={el}>{el}</Link></li>
                         })
                     }
-                    {
-                        jwtDecode(localStorage.usertoken).email
-                    }
+                    </ol>
+                    { this.props.userData.email }
                 </div>
             </div>
         )
     }
 }
+
+const mapStateToProps = (state) => {
+    return {userData: state.userState.userData}
+}
+
+const mapDispatchToProps = {
+    updateUserDataState,
+    updateBoardDataState
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home)

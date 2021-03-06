@@ -2,6 +2,8 @@ import React, {Component} from "react"
 import {BrowserRouter} from 'react-router-dom'
 import {Switch, Route, Redirect} from 'react-router-dom'
 
+import {connect} from "react-redux"
+
 import './App.css';
 import Home from "../pages/Home/Home";
 import Register from "../pages/Register/Register";
@@ -12,7 +14,7 @@ import Calendar from "../pages/Calendar/calendar";
 import Boards from "../pages/Boards/boards";
 import Sidebar from "../components/Sidebar/Sidebar";
 
-export default class App extends Component{
+class App extends Component{
     render() {
         const loginRegLink = (
             <Switch>
@@ -46,3 +48,9 @@ export default class App extends Component{
         )
     }
 }
+
+const mapStateToProps = (state) => {
+    return {userData: state.userState.userData}
+}
+
+export default connect(mapStateToProps)(App)

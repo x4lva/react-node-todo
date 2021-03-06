@@ -1,5 +1,6 @@
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema
+const arrayUniquePlugin = require('mongoose-unique-array');
 
 const UserSchema = new Schema({
     name: {
@@ -15,13 +16,11 @@ const UserSchema = new Schema({
         required: true
     },
     boards: {
-        type: [String],
-        default: [],
-    },
-    created_at: {
-        type: Date,
-        default: Date.now
+        type: [mongoose.Types.ObjectId],
+        default: []
     }
-})
+}, {timestamps: true})
+
+
 
 module.exports = User = mongoose.model('user', UserSchema)
