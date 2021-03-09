@@ -52,3 +52,4 @@ io.on("connection", (socket) => {
 app.use("/board", require("./routes/Board"))
 app.use("/user", require("./routes/User"))
 app.use("/todo", require("./routes/Todo"))
+app.use("/todoitem", require("./routes/TodoItem"))

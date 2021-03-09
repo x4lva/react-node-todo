@@ -15,10 +15,7 @@ const TodoSchema = new Schema({
         required: true
     },
     users: {
-        type: [{
-            type: mongoose.Types.ObjectId,
-            unique: true
-        }],
+        type: [mongoose.Types.ObjectId],
         default: []
     }
 }, {timestamps: true})

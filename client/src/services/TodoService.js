@@ -23,7 +23,7 @@ export const getBoardTodos = async (boardId) => {
 export const createTodo = async (todoName, boardId, userId) => {
     return await axios.post("http://localhost:3000/todo/create", {todoName, boardId, userId})
         .then(res => {
-            return res.status
+            return res.data
         })
         .catch(err => {
             console.log(err)

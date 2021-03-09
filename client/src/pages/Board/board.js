@@ -5,13 +5,12 @@ import {addBoardMember, getBoardData, getBoardUsers} from "../../services/BoardS
 import {getUserData} from "../../services/UserService";
 import jwtDecode from "jwt-decode";
 import UsersList from "../../components/UserList/UsersList";
-import {ToastsContainer, ToastsStore} from 'react-toasts';
 import {Modal} from "react-bootstrap";
 import BoardBody from "../../components/BoardBody/BoardBody";
-import socket from "../../utilities/OpenSocket";
 import {connect} from "react-redux"
 import {updateUserDataState} from "../../redux/actions/UserActions";
 import {
+    addMemberToBoard,
     changeBoardAddMemberId,
     getBoardState,
     toggleBoardAddMember, updateBoardDataState,
@@ -40,7 +39,8 @@ class Board extends Component{
     }
 
     boardAddMemberModal(){
-        this.props.updateBoardDataState({name: this.props.boardAddMemberData.boardAddMemberId})
+        this.toggleAddMemberModal(false)
+        this.props.addMemberToBoard(this.props.boardAddMemberData.boardAddMemberId, this.props.boardData._id)
     }
 
     render() {
@@ -63,10 +63,9 @@ class Board extends Component{
                 </div>
                 <div className="mt-4 d-flex justify-content-center">
                     <div className="col-12 col-md-8 col-lg-11">
-                        <BoardBody updateBoard={this.updateBoard} board={this.props.boardData}/>
+                        <BoardBody/>
                     </div>
                 </div>
-                <ToastsContainer store={ToastsStore}/>
                 <Modal show={this.props.boardAddMemberData.boardAddMember} onHide={this.toggleAddMemberModal}>
                     <div className="modal-header">
                         <h5 className="modal-title">Add new board member</h5>
@@ -90,7 +89,6 @@ class Board extends Component{
 }
 
 const mapStateToProps = (state) => {
-    console.log(state.boardState.boardUsersData)
     return {
         userData: state.userState.userData,
         boardData: state.boardState.boardData,
@@ -107,6 +105,7 @@ const mapDispatchToProps = {
     updateBoardDataState,
     getBoardState,
     toggleBoardAddMember,
+    addMemberToBoard,
     changeBoardAddMemberId
 }
 

@@ -27,17 +27,6 @@ export const registerUser = async (userName, userEmail, userPassword) => {
         })
 }
 
-export const connectBoard = async (userId, boardId) => {
-    return await axios
-        .post("http://localhost:3000/user/connect", {userId, boardId})
-        .then(response => {
-            console.log(response.data)
-        })
-        .catch(err => {
-            console.log(err)
-        })
-}
-
 export const getUserData = async (userId) => {
     return await axios
         .post("http://localhost:3000/user/data ", {userId})
@@ -54,6 +43,17 @@ export const updateUsersData = async (userData) => {
         .post("http://localhost:3000/user/update", {userData})
         .then(response => {
             return response.data
+        })
+        .catch(err => {
+            console.log(err)
+        })
+}
+
+export const addUserBoard = async (userId, boardId) => {
+    return await axios
+        .post("http://localhost:3000/user/update/board", {userId, boardId})
+        .then(response => {
+            return {data: response.data, status: response.data.status}
         })
         .catch(err => {
             console.log(err)

@@ -7,23 +7,24 @@ const TodoItemSchema = new Schema({
         required: true
     },
     description: {
-        type: Text,
+        type: String,
         default: ''
     },
-    board_id: {
+    todo_id: {
         type: mongoose.Types.ObjectId,
         required: true
     },
     creator: {
-        type: String,
+        type: mongoose.Types.ObjectId,
         required: true
     },
     users: {
-        type: [{
-            type: mongoose.Types.ObjectId,
-            unique: true
-        }],
+        type: [mongoose.Types.ObjectId],
         default: []
+    },
+    order: {
+        type: Number,
+        default: undefined
     }
 }, {timestamps: true})
 

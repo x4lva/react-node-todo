@@ -85,7 +85,6 @@ board.post('/update',  (req, res) => {
 
     Board.findByIdAndUpdate(boardData._id, {$addToSet: {users: boardData.users}, ...boardData}, {new: true})
         .then(board =>  {
-            console.log(board)
             res.status(200).json(board)
         })
         .catch(err => {

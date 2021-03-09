@@ -9,3 +9,7 @@
     width: 1px;
     background: #dee2e6;
 }
+.board-todo-list-item-header {
+    font-size: 19px;
+    width: 235px;
+}

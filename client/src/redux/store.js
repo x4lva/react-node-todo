@@ -4,7 +4,6 @@ import thunk from "redux-thunk"
 import userReducer from "./reducers/UserReducer";
 import boardReducer from "./reducers/BoardReducer";
 
-
 const rootReducer = combineReducers({
     userState: userReducer,
     boardState: boardReducer

@@ -1,7 +1,6 @@
 .board-todo-list-item {
     background: #fff;
     border-radius: 0.25rem;
-    margin-bottom: 25px;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -33,6 +32,7 @@
     width: 100%;
     outline: none;
     background: transparent;
+    font-weight: 600;
     border-radius: 0.25rem;
     transition: .3s ease-in-out;
 }
@@ -78,4 +78,32 @@
 }
 .board-todo-list-item-add textarea{
     resize: none;
+}
+.board-todo-list-item-content ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.board-todo-list-item-content ul li{
+    background: #ECECF0;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    padding: 5px 10px;
+}
+.board-todo-list-item-content ul li:last-child{
+    margin-bottom: 0;
+}
+.board-todo-lists-item-header{
+    font-size: 16px;
+    font-weight: 400;
+}
+.board-todo-list-item-content ul li p{
+    margin-bottom: 0;
+}
+.board-todo-list-item-content {
+    height: fit-content;
+    max-height: 480px;
+    overflow-y: scroll;
+    margin-top: 10px;
+    border-radius: 4px;
 }

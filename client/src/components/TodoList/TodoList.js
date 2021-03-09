@@ -1,38 +1,35 @@
 import React, {Component} from "react";
-import ReactDOM from "react-dom"
 import "./TodoList.css"
-import {deleteTodo, getTodoData, updateTodo} from "../../services/TodoService";
-import {OverlayTrigger, Popover} from "react-bootstrap";
-import socket from "../../utilities/OpenSocket";
-import jwtDecode from "jwt-decode";
+import {connect} from "react-redux"
+import {createTodoListItem, deleteTodoBoard, getTodoListItems, updateTodoList} from "../../redux/actions/BoardActions";
+import {Draggable, Droppable} from "react-beautiful-dnd";
+import TodoListItem from "../TodoListItem/TodoListItem";
 
-export default class TodoList extends Component{
+class TodoList extends Component{
 
     constructor(props) {
         super(props)
 
         this.state = {
-            todo: {
-                name: ''
-            },
-            showTodoActions: false,
-            todoDeleted: false,
-            createTodoListItem: false,
-            newTodoName: '',
-            newTodoNameRows: 3,
-            newTodoNameMinRows: 3,
+            todoListIsDeleted: false,
+            todoListAddTodoItem: false,
+            todoListAddTodoItemName: '',
+            todoListRename: this.props.todo.name,
+            todoListShowActions: false,
+            newTodoNameRows: 2,
+            newTodoNameMinRows: 2,
             newTodoNameMaxRows: 10
         }
 
         this.onTodoNameChange = this.onTodoNameChange.bind(this)
         this.onTodoNameChangeEnd = this.onTodoNameChangeEnd.bind(this)
-        this.updateTodo = this.updateTodo.bind(this)
         this.toggleTodoActions = this.toggleTodoActions.bind(this)
         this.handleClickOutside = this.handleClickOutside.bind(this)
         this.setWrapperRef = this.setWrapperRef.bind(this)
         this.onTodoDelete = this.onTodoDelete.bind(this)
         this.toggleCreateTodoList = this.toggleCreateTodoList.bind(this)
         this.onNewTodoNameChange = this.onNewTodoNameChange.bind(this)
+        this.createTodoListItem = this.createTodoListItem.bind(this)
     }
 
     onNewTodoNameChange(e){
@@ -54,60 +51,43 @@ export default class TodoList extends Component{
         }
 
         this.setState({
-            newTodoName: e.target.value,
+            todoListAddTodoItemName: e.target.value,
             newTodoNameRows: currentRows < newTodoNameMaxRows ? currentRows : newTodoNameMaxRows,
         });
     }
 
     onTodoNameChange(e){
-        this.setState((state) => {
-            return {todo: {...state.todo, name: e.target.value}}
+        this.setState({
+            todoListRename: e.target.value
         })
     }
 
     onTodoDelete(){
         this.setState({
-            todoDeleted: true
+            todoListIsDeleted: true
         })
-        deleteTodo(this.state.todo._id).then(res => {
-            if (res === 200){
-                socket.emit("deleteTodo", {user: jwtDecode(localStorage.usertoken).name, boardName: this.state.todo.name})
-            }
-        })
-    }
-
-    async updateTodo(){
-        await updateTodo(this.state.todo)
-        socket.emit("todoChanged")
+        this.props.deleteTodoBoard(this.props.todo._id)
     }
 
     onTodoNameChangeEnd(e){
-        if (e.key === 'Enter') {
-            this.updateTodo()
+        if (e.key === "Enter" || e.button === 0){
+            this.props.updateTodoList({name: this.state.todoListRename}, this.props.todo._id)
         }
-        this.updateTodo()
     }
 
-    componentDidMount() {
+    async componentDidMount() {
+        await this.props.getTodoListItems(this.props.todo._id)
         document.addEventListener('mousedown', this.handleClickOutside);
-        getTodoData(this.props.todo)
-            .then(res => {
-                this.setState({
-                    todo: res
-                })
-            })
     }
 
     setWrapperRef(node) {
         this.wrapperRef = node;
     }
 
-
     handleClickOutside(e){
-        console.log(e.target)
         if (this.wrapperRef && !this.wrapperRef.contains(e.target)) {
             this.setState({
-                showTodoActions: false
+                todoListShowActions: false
             })
         }
     }
@@ -118,36 +98,76 @@ export default class TodoList extends Component{
 
     toggleTodoActions(state){
         this.setState({
-            showTodoActions: state
+            todoListShowActions: state
         })
     }
 
-    toggleCreateTodoList(state){
+    toggleCreateTodoList(){
+        if (this.state.todoListAddTodoItem === false){
+            const scroll =
+                this.addTodoListItemEnd.scrollHeight -
+                this.addTodoListItemEnd.clientHeight;
+            this.addTodoListItemEnd.scrollTo(0, scroll);
+        }else{
+            this.addTodoListItemEnd.scrollTo(0, 0)
+        }
         this.setState({
-            createTodoListItem: state
+            todoListAddTodoItem: !this.state.todoListAddTodoItem
         })
     }
 
+    createTodoListItem(){
+        this.props.createTodoListItem(this.props.todo._id, this.state.todoListAddTodoItemName)
+        this.setState({
+            todoListAddTodoItemName: '',
+            newTodoNameRows: this.state.newTodoNameMinRows
+        })
+    }
 
     render() {
-        if (this.state.todoDeleted) {return ('')}
+        if (this.state.todoListIsDeleted) {return ('')}
 
         let todoActionClassName = "board-todo-list-item-actions rounded-2 p-2  handle-actions-click"
-        if (this.state.showTodoActions){
+        if (this.state.todoListShowActions){
             todoActionClassName+=" list-item-actions-active"
         }
 
-        let addTodoClassName = "board-todo-list-item-add"
-        if (this.state.createTodoListItem){
-            addTodoClassName+=" todo-list-add-active"
+        let addTodoClassName = "board-todo-list-item-add todo-list-add-active"
+        if (this.state.todoListAddTodoItem){
+            addTodoClassName+=""
         }
+
+        const todoItemsList = this.props.boardTodoListItems.todoItems
+
+        const result = todoItemsList
+
+        console.log(result)
+
+        const todoItems = result.map((item, index) => {
+            return (
+                <Draggable key={item._id} draggableId={item._id} index={item.order}>
+                    {(provided, snapshot) => (
+                        <li style={{...snapshot.isDragging, ...provided.draggableProps.style}} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                            <TodoListItem todoItem={item} />
+                        </li>
+                    )}
+                </Draggable>
+            )
+        })
 
         return(
             <div draggable="false" className="board-todo-list-item shadow-sm p-3 d-flex flex-column">
                 <div className="board-todo-list-item-header d-flex align-items-center">
-                    <span><input onKeyDown={this.onTodoNameChangeEnd} onBlur={this.onTodoNameChangeEnd} onChange={this.onTodoNameChange} value={this.state.todo.name} className="board-todo-list-item-header-title" type="text"/></span>
+                    <span>
+                        <input onKeyDown={this.onTodoNameChangeEnd}
+                               onBlur={this.onTodoNameChangeEnd}
+                               onChange={this.onTodoNameChange}
+                               value={this.state.todoListRename}
+                               className="board-todo-list-item-header-title"
+                               type="text"/>
+                    </span>
                     <div className="board-todo-list-item-controls d-flex">
-                        <div onClick={() => this.toggleCreateTodoList(!this.state.createTodoListItem)} className="todo-list-control">
+                        <div onClick={this.toggleCreateTodoList} className="todo-list-control">
                             <i className="fas fa-plus"></i>
                         </div>
                         <div onClick={() => this.toggleTodoActions(true)} className="todo-list-control">
@@ -155,16 +175,28 @@ export default class TodoList extends Component{
                         </div>
                     </div>
                 </div>
-                <div className="board-todo-list-item-content">
-                    {this.state.todo._id}
-                </div>
-                <div className={addTodoClassName}>
-                    <textarea value={this.state.newTodoName} rows={this.state.newTodoNameRows} onChange={this.onNewTodoNameChange} placeholder="Todo name" className="form-control mb-3" type="text" />
-                    <div className="d-flex justify-content-between">
-                        <div className="btn btn-dark w-100 me-3">Save</div>
-                        <div onClick={() => this.toggleCreateTodoList(false)} o className="btn btn-secondary"><i className="fas fa-times"></i></div>
-                    </div>
-                </div>
+                <Droppable droppableId={this.props.todo._id}>
+                    {(provided, snapshot) => (
+                        <div ref={provided.innerRef} style={{...snapshot.isDraggingOver}} className="board-todo-list-item-content">
+                            <ul>
+                                {todoItems}
+                            </ul>
+                            {provided.placeholder}
+                            <div draggable={false} className={addTodoClassName}>
+                            <textarea value={this.state.todoListAddTodoItemName}
+                                      ref={el => this.addTodoListItemEnd = el}
+                                  rows={this.state.newTodoNameRows}
+                                  onChange={this.onNewTodoNameChange}
+                                  placeholder="Todo name"
+                                  className="form-control mb-2 mt-2"
+                                  type="text" />
+                                <div className="d-flex justify-content-between">
+                                    <div className="btn btn-dark w-100" onClick={this.createTodoListItem}>Save</div>
+                                </div>
+                            </div>
+                        </div>
+                        )}
+                </Droppable>
                 <div ref={this.setWrapperRef} className={todoActionClassName}>
                     <div className="board-todo-list-item-action">
                         Copy list
@@ -180,3 +212,20 @@ export default class TodoList extends Component{
         )
     }
 }
+const mapStateToProps = (state) => {
+    return {
+        userData: state.userState.userData,
+        boardData: state.boardState.boardData,
+        boardUsersData: state.boardState.boardUsersData,
+        boardTodoListItems: state.boardState.boardTodoListItems
+    }
+}
+
+const mapDispatchToProps = {
+    deleteTodoBoard,
+    updateTodoList,
+    createTodoListItem,
+    getTodoListItems
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(TodoList)

@@ -1,6 +1,5 @@
 import {UPDATE_USER_DATA} from "../types/UserTypes";
 import {getUserData, updateUsersData} from "../../services/UserService";
-import store from "../store";
 
 export const updateUserData = (payload) => {
     return {

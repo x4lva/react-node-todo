@@ -2,6 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
+const mongoose = require('mongoose')
 
 const user = express.Router()
 
@@ -9,19 +10,6 @@ const User = require('../schema/User')
 const Board = require('../schema/Board')
 
 process.env.SECRET_KEY = 'x4lva'
-
-user.post("/connect", (req, res) => {
-    User.findByIdAndUpdate(req.body.userId, { $addToSet: {boards: new String(req.body.boardId)}})
-        .then(board => {
-            res.json({ status: 200 })
-
-            Board.findByIdAndUpdate({_id: req.body.boardId}, { $addToSet: {users: new String(req.body.userId)}}, (docs) => {})
-
-        })
-        .catch(err => {
-            res.send('error: ' + err)
-        })
-})
 
 user.post("/login", (req, res) => {
     User.findOne({
@@ -99,14 +87,43 @@ user.post("/update", async (req, res) => {
 
     const {userData} = req.body
 
-    User.findByIdAndUpdate(userData._id, {$addToSet: {boards: userData.boards}, userData}, {})
+    User.findByIdAndUpdate(userData._id, userData, {new: true})
         .then((user) => {
-            Board.findByIdAndUpdate({_id: userData.boards.slice(-1)[0]}, {$addToSet: {users: user._id}}, {})
             res.status(200).json(user)
         })
         .catch(err => {
             res.send('error: ' + err)
         })
+})
+
+
+user.post("/update/board", (req, res) => {
+
+    const {userId, boardId} = req.body
+
+    console.log(userId, boardId)
+
+    if (mongoose.Types.ObjectId.isValid(userId)){
+        User.findByIdAndUpdate({_id: mongoose.Types.ObjectId(userId)}, {$addToSet: {boards: boardId}}, {new: true})
+            .then((user) => {
+                Board.findOneAndUpdate({_id: boardId}, {$addToSet: {users: userId}}, {new: true})
+                    .then(board => {
+                        res.json({user, board, status: 200})
+                    })
+                    .catch(err => {
+                        res.status(501).json({message: err})
+                    })
+            })
+            .catch(err => {
+                res.status(501).json({message: err})
+            })
+    }else{
+        res.json({message: "User id is not valid", status: 501})
+    }
+
+
+
+
 })
 
 

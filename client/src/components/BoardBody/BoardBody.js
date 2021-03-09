@@ -1,30 +1,26 @@
 import React, {Component} from "react"
 import "./BoardBody.css"
 import TodoList from "../TodoList/TodoList";
-import {createTodo, getBoardTodos} from "../../services/TodoService";
-import jwtDecode from "jwt-decode";
-import {ToastsContainer, ToastsStore} from "react-toasts";
-import socket from "../../utilities/OpenSocket";
 import ScrollContainer from "react-indiana-drag-scroll";
+import {connect} from "react-redux"
+import {
+    boardCreateTodoList, changeBoardAddTodo,
+    getBoardState, moveTodoItemToList, reorderCurrentTodoListItems, toggleAddBoardTodo,
+} from "../../redux/actions/BoardActions";
+import {ToastsStore} from "react-toasts";
+import {DragDropContext} from "react-beautiful-dnd";
 
-export default class BoardBody extends Component{
+class BoardBody extends Component {
 
     constructor(props) {
         super(props)
+
 
         this.toggleBoardCreate = this.toggleBoardCreate.bind(this)
         this.handleClickOutside = this.handleClickOutside.bind(this);
         this.onTodoCreate = this.onTodoCreate.bind(this);
         this.onTodoNameChange = this.onTodoNameChange.bind(this);
-
-        this.updateBoard = () => this.props.updateBoard
-
-        this.state = {
-            boardData: this.props.board,
-            boardCreate: false,
-            createTodoName: '',
-            todoList: []
-        }
+        this.onDrag = this.onDrag.bind(this);
     }
 
     componentDidMount() {
@@ -35,50 +31,36 @@ export default class BoardBody extends Component{
         document.removeEventListener('mousedown', this.handleClickOutside);
     }
 
-    componentDidUpdate(prevProps,prevState) {
-        if (prevProps.board !== this.props.board){
-            getBoardTodos(this.props.board._id).then(res => {
-                    this.setState ({
-                        todoList: res
-                    })
-                }
-            )
+    toggleBoardCreate(state) {
+        this.props.toggleAddBoardTodo(state)
+    }
+
+    onTodoCreate(e) {
+        if (e.key === "Enter" || e.button === 0){
+            this.props.boardCreateTodoList()
         }
     }
 
-    toggleBoardCreate(state){
-        this.setState({
-            boardCreate: state
-        })
-    }
-
-    onTodoCreate(e){
-        if (e.key === "Enter" || e.button == 0){
-            if (this.state.createTodoName.length !== 0){
-                createTodo(this.state.createTodoName, this.props.board._id, jwtDecode(localStorage.usertoken)._id)
-                    .then(res => {
-                        if (res === 200){
-                            socket.emit("createTodo", {user: jwtDecode(localStorage.usertoken).name, boardName: this.state.createTodoName})
-                            this.setState({
-                                createTodoName: ''
-                            })
-                        }
-                    })
-            }else{
-                ToastsStore.error("List name can not be empty")
-            }
-        }
-    }
-
-    onTodoNameChange(e){
-        this.setState({
-            createTodoName: e.target.value
-        })
+    onTodoNameChange(e) {
+        this.props.changeBoardAddTodo(e.target.value)
     }
 
     handleClickOutside(e) {
-        if (!(e.target.id === "createBoard") && (e.button ==! 2)){
-            this.toggleBoardCreate(false)
+        if (!(e.target.id === "createBoard") && (e.button == !2)) {
+            this.props.toggleAddBoardTodo(false)
+        }
+    }
+
+    onDrag(result){
+        if (!result.destination) {
+            return;
+        }
+
+        if (result.destination.droppableId === result.source.droppableId && result.destination.index !== result.source.index){
+            this.props.reorderCurrentTodoListItems(result.source.droppableId, result.source.index, result.destination.index)
+        }
+        if (result.destination.droppableId !== result.source.droppableId){
+            this.props.moveTodoItemToList(result.source.droppableId, result.destination.droppableId, result.source.index, result.destination.index)
         }
     }
 
@@ -86,15 +68,15 @@ export default class BoardBody extends Component{
 
         let createBoardClass = "shadow-sm"
 
-        if (!this.state.boardCreate){
+        if (!this.props.boardTodoCreate) {
             createBoardClass += " opacity-0"
         }
 
-        const todoLists = this.state.todoList.map(el => {
-            return <TodoList dragable={false} key={el._id} todo={el._id} />
+        const todoList = this.props.boardTodoLists.map(el => {
+            return <TodoList key={el._id} todo={el}/>
         })
 
-        return(
+        return (
             <div>
                 <div className="board-controls d-flex justify-content-between">
                     <div className="board-controls-search input-group mb-3 shadow-sm">
@@ -102,7 +84,7 @@ export default class BoardBody extends Component{
                         <input type="text" className="border-0 form-control" placeholder="Search Item"/>
                     </div>
                     <div className="board-controls-filter">
-                        <div onClick={() => this.toggleBoardCreate(true)} className="btn btn-dark shadow-sm">
+                        <div onClick={() => this.props.toggleAddBoardTodo(true)} className="btn btn-dark shadow-sm">
                             New List
                         </div>
                         <div className="btn bg-white border-1 shadow-sm">
@@ -110,15 +92,53 @@ export default class BoardBody extends Component{
                         </div>
                     </div>
                 </div>
-                <ScrollContainer onClick={e => console.log(e.target)} ignoreElements=".board-todo-list-item, #createBoard" stopPropagation={true} horizontal={true} hideScrollbars={false} vertical={false} className="scroll-container d-flex">
-                    {todoLists}
-                    <div className={createBoardClass} id="createBoard" onClick={() => this.toggleBoardCreate(true)}>
-                        <input onKeyDown={this.onTodoCreate} value={this.state.createTodoName} onChange={this.onTodoNameChange} placeholder="List name" className="mb-3 form-control" type="text"/>
-                        <div onClick={this.onTodoCreate} className="btn btn-dark">Save</div>
+                <ScrollContainer onClick={e => console.log(e.target)}
+                                 ignoreElements=".board-todo-list-item, #createBoard"
+                                 stopPropagation={true}
+                                 horizontal={true}
+                                 hideScrollbars={false}
+                                 vertical={false}
+                                 className="scroll-container d-flex">
+
+                    <DragDropContext onDragEnd={this.onDrag} >
+                        {todoList}
+                    </DragDropContext>
+                    <div className={createBoardClass}
+                         id="createBoard"
+                         onClick={() => this.props.toggleAddBoardTodo(true)}>
+                        <input onKeyDown={this.onTodoCreate}
+                               value={this.props.boardTodoCreateName}
+                               onChange={this.onTodoNameChange}
+                               placeholder="List name"
+                               className="mb-3 form-control"
+                               type="text"/>
+                        <div onClick={this.onTodoCreate}
+                             className="btn btn-dark">Save</div>
                     </div>
                 </ScrollContainer>
-                <ToastsContainer store={ToastsStore}/>
             </div>
         )
     }
 }
+
+const mapStateToProps = (state) => {
+    return {
+        userData: state.userState.userData,
+        boardData: state.boardState.boardData,
+        boardUsersData: state.boardState.boardUsersData,
+        boardTodoCreate: state.boardState.boardTodoCreate,
+        boardTodoCreateName: state.boardState.boardTodoCreateName,
+        boardTodoLists: state.boardState.boardTodoLists,
+    }
+}
+
+const mapDispatchToProps = {
+    getBoardState,
+    toggleAddBoardTodo,
+    changeBoardAddTodo,
+    boardCreateTodoList,
+    reorderCurrentTodoListItems,
+    moveTodoItemToList
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(BoardBody)

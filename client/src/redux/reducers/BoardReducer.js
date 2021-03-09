@@ -9,7 +9,11 @@ const initialState = {
     },
     boardUsersData: [],
     boardAddMember: false,
-    boardAddMemberId: ''
+    boardAddMemberId: '',
+    boardTodoCreate: false,
+    boardTodoCreateName: '',
+    boardTodoLists: [],
+    boardTodoListItems: []
 }
 
 const boardReducer = (state = initialState, action) => {

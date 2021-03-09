@@ -1,5 +1,7 @@
+
 const express = require('express')
 const cors = require('cors')
+const mongoose = require('mongoose')
 const todo = express.Router()
 
 const Todo = require('../schema/Todo')
@@ -20,13 +22,16 @@ todo.post("/data", (req, res) => {
 })
 
 todo.post("/board", (req, res) => {
-    Todo.find({board_id: new String(req.body.boardId)})
-        .then(todo => {
-            res.json(todo)
-        })
-        .catch(err => {
-            res.send('error: ' + err)
-        })
+    if (mongoose.Types.ObjectId.isValid(req.body.boardId)){
+        Todo.find({board_id: req.body.boardId})
+            .then(todo => {
+                res.json(todo)
+            })
+            .catch(err => {
+                console.log(err)
+                res.send('error: ' + err)
+            })
+    }
 })
 
 todo.post("/create", (req, res) => {
@@ -42,19 +47,24 @@ todo.post("/create", (req, res) => {
 
     Todo.create(todoData)
         .then(todo => {
-            res.status(200).json({message: "Todo list has been created"})
+            console.log(todo)
+            res.status(200).json(todo)
         })
         .catch(err => {
+            console.log(err)
+
             res.send('error: ' + err)
         })
 })
 
 todo.post("/update", (req, res) => {
 
-    const {todoData} = req.body
+    const {todoData, todoId} = req.body
+
+    console.log(todoData)
 
 
-    Todo.findByIdAndUpdate(todoData._id, todoData,{setDefaultsOnInsert: true}, (doc) => {})
+    Todo.findByIdAndUpdate(todoId, todoData, {})
         .then(todo => {
             res.status(200).json({message: "Todo list has been created"})
         })

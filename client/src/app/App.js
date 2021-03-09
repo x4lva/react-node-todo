@@ -1,6 +1,7 @@
 import React, {Component} from "react"
 import {BrowserRouter} from 'react-router-dom'
 import {Switch, Route, Redirect} from 'react-router-dom'
+import {ToastsStore, ToastsContainer} from "react-toasts";
 
 import {connect} from "react-redux"
 
@@ -15,6 +16,9 @@ import Boards from "../pages/Boards/boards";
 import Sidebar from "../components/Sidebar/Sidebar";
 
 class App extends Component{
+
+
+
     render() {
         const loginRegLink = (
             <Switch>
@@ -44,6 +48,7 @@ class App extends Component{
         return (
             <BrowserRouter>
                 {localStorage.usertoken ? userLink : loginRegLink}
+                <ToastsContainer store={ToastsStore}/>
             </BrowserRouter>
         )
     }
