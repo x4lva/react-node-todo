@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const BoardScheme = new Schema(
+const BoardMessageScheme = new Schema(
     {
-        name: {
+        text: {
             type: String,
             required: true,
         },
@@ -11,12 +11,15 @@ const BoardScheme = new Schema(
             type: mongoose.Types.ObjectId,
             required: true,
         },
-        users: {
-            type: [mongoose.Types.ObjectId],
-            default: [],
+        board: {
+            type: mongoose.Types.ObjectId,
+            required: true,
         },
     },
     { timestamps: true }
 );
 
-module.exports = Board = mongoose.model("board", BoardScheme);
+module.exports = BoardMessage = mongoose.model(
+    "boardMessage",
+    BoardMessageScheme
+);

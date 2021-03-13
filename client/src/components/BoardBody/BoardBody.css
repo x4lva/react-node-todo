@@ -1,5 +1,5 @@
-.board-controls-search{
-    width: 23% !important;
+.board-controls-search {
+    width: 270px !important;
 }
 .board-controls-filter .btn{
     min-width: 120px;
@@ -15,10 +15,19 @@
     height: fit-content;
     transition: .3s ease-in-out;
 }
-#createBoard{
-    width: 268px;
+#createBoard input{
+    width: 225px
 }
 .scroll-container{
     overflow-x: auto;
-    height: 555px;
+    height: 565px;
+}
+.board-todo-list-space{
+    height: fit-content;
+}
+.board-todo-list-item-add textarea:focus{
+    box-shadow: none;
+}
+.add-todo-list-active{
+    opacity: 0;
 }

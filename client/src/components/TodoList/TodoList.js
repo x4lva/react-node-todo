@@ -1,38 +1,52 @@
-import React, {Component} from "react";
-import "./TodoList.css"
-import {connect} from "react-redux"
-import {createTodoListItem, deleteTodoBoard, getTodoListItems, updateTodoList} from "../../redux/actions/BoardActions";
-import {Draggable, Droppable} from "react-beautiful-dnd";
+import React, { Component } from "react";
+import "./TodoList.css";
+import { connect } from "react-redux";
+import {
+    clearTodoList,
+    copyTodoToCurrentBoard,
+    createTodoListItem,
+    deleteTodoBoard,
+    deleteTodoItem,
+    getTodoListItems,
+    updateTodoList,
+} from "../../redux/actions/BoardActions";
+import { Draggable, Droppable } from "react-beautiful-dnd";
 import TodoListItem from "../TodoListItem/TodoListItem";
+import ComponentAction from "../ComponentAction/ComponentAction";
+import socket from "../../utilities/OpenSocket";
+import { ToastsStore } from "react-toasts";
 
-class TodoList extends Component{
-
+class TodoList extends Component {
     constructor(props) {
-        super(props)
+        super(props);
 
         this.state = {
             todoListIsDeleted: false,
             todoListAddTodoItem: false,
-            todoListAddTodoItemName: '',
+            todoListAddTodoItemName: "",
             todoListRename: this.props.todo.name,
             todoListShowActions: false,
-            newTodoNameRows: 2,
-            newTodoNameMinRows: 2,
-            newTodoNameMaxRows: 10
-        }
+            newTodoNameRows: 1,
+            newTodoNameMinRows: 1,
+            newTodoNameMaxRows: 10,
+        };
 
-        this.onTodoNameChange = this.onTodoNameChange.bind(this)
-        this.onTodoNameChangeEnd = this.onTodoNameChangeEnd.bind(this)
-        this.toggleTodoActions = this.toggleTodoActions.bind(this)
-        this.handleClickOutside = this.handleClickOutside.bind(this)
-        this.setWrapperRef = this.setWrapperRef.bind(this)
-        this.onTodoDelete = this.onTodoDelete.bind(this)
-        this.toggleCreateTodoList = this.toggleCreateTodoList.bind(this)
-        this.onNewTodoNameChange = this.onNewTodoNameChange.bind(this)
-        this.createTodoListItem = this.createTodoListItem.bind(this)
+        this.onTodoNameChange = this.onTodoNameChange.bind(this);
+        this.onTodoNameChangeEnd = this.onTodoNameChangeEnd.bind(this);
+        this.toggleTodoActions = this.toggleTodoActions.bind(this);
+        this.handleClickOutside = this.handleClickOutside.bind(this);
+        this.setWrapperRef = this.setWrapperRef.bind(this);
+        this.setActionWrapperRef = this.setActionWrapperRef.bind(this);
+        this.onTodoDelete = this.onTodoDelete.bind(this);
+        this.onNewTodoNameChange = this.onNewTodoNameChange.bind(this);
+        this.createTodoListItem = this.createTodoListItem.bind(this);
     }
 
-    onNewTodoNameChange(e){
+    setActionWrapperRef(node) {
+        this.actionRef = node;
+    }
+
+    onNewTodoNameChange(e) {
         const textareaLineHeight = 24;
         const { newTodoNameMinRows, newTodoNameMaxRows } = this.state;
 
@@ -52,180 +66,241 @@ class TodoList extends Component{
 
         this.setState({
             todoListAddTodoItemName: e.target.value,
-            newTodoNameRows: currentRows < newTodoNameMaxRows ? currentRows : newTodoNameMaxRows,
+            newTodoNameRows:
+                currentRows < newTodoNameMaxRows
+                    ? currentRows
+                    : newTodoNameMaxRows,
         });
     }
 
-    onTodoNameChange(e){
+    onTodoNameChange(e) {
         this.setState({
-            todoListRename: e.target.value
-        })
+            todoListRename: e.target.value,
+        });
     }
 
-    onTodoDelete(){
+    onTodoDelete() {
         this.setState({
-            todoListIsDeleted: true
-        })
-        this.props.deleteTodoBoard(this.props.todo._id)
+            todoListIsDeleted: true,
+        });
+        this.props.deleteTodoBoard(this.props.todo._id);
     }
 
-    onTodoNameChangeEnd(e){
-        if (e.key === "Enter" || e.button === 0){
-            this.props.updateTodoList({name: this.state.todoListRename}, this.props.todo._id)
+    onTodoNameChangeEnd(e) {
+        if (e.key === "Enter" || e.button === 0) {
+            this.props.updateTodoList(
+                { name: this.state.todoListRename },
+                this.props.todo._id
+            );
         }
     }
 
     async componentDidMount() {
-        await this.props.getTodoListItems(this.props.todo._id)
-        document.addEventListener('mousedown', this.handleClickOutside);
+        await this.props.getTodoListItems(this.props.todo._id);
+        socket.on("board-updated-todos", (res) => {
+            this.props.getTodoListItems(this.props.todo._id);
+        });
+        document.addEventListener("mousedown", this.handleClickOutside);
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener("mousedown", this.handleClickOutside);
+        socket.off("board-updated-todos");
     }
 
     setWrapperRef(node) {
         this.wrapperRef = node;
     }
 
-    handleClickOutside(e){
-        if (this.wrapperRef && !this.wrapperRef.contains(e.target)) {
-            this.setState({
-                todoListShowActions: false
-            })
+    handleClickOutside(e) {
+        if (
+            !this.wrapperRef.contains(e.target) &&
+            !this.actionRef.contains(e.target)
+        ) {
+            this.toggleTodoActions(false);
         }
     }
 
-    componentWillUnmount() {
-        document.removeEventListener('mousedown', this.handleClickOutside);
+    toggleTodoActions(state) {
+        this.setState({
+            todoListShowActions: state,
+        });
     }
 
-    toggleTodoActions(state){
+    createTodoListItem() {
+        this.props.createTodoListItem(
+            this.props.todo._id,
+            this.state.todoListAddTodoItemName
+        );
         this.setState({
-            todoListShowActions: state
-        })
-    }
-
-    toggleCreateTodoList(){
-        if (this.state.todoListAddTodoItem === false){
-            const scroll =
-                this.addTodoListItemEnd.scrollHeight -
-                this.addTodoListItemEnd.clientHeight;
-            this.addTodoListItemEnd.scrollTo(0, scroll);
-        }else{
-            this.addTodoListItemEnd.scrollTo(0, 0)
-        }
-        this.setState({
-            todoListAddTodoItem: !this.state.todoListAddTodoItem
-        })
-    }
-
-    createTodoListItem(){
-        this.props.createTodoListItem(this.props.todo._id, this.state.todoListAddTodoItemName)
-        this.setState({
-            todoListAddTodoItemName: '',
-            newTodoNameRows: this.state.newTodoNameMinRows
-        })
+            todoListAddTodoItemName: "",
+            newTodoNameRows: this.state.newTodoNameMinRows,
+        });
     }
 
     render() {
-        if (this.state.todoListIsDeleted) {return ('')}
-
-        let todoActionClassName = "board-todo-list-item-actions rounded-2 p-2  handle-actions-click"
-        if (this.state.todoListShowActions){
-            todoActionClassName+=" list-item-actions-active"
+        if (this.state.todoListIsDeleted) {
+            return "";
         }
 
-        let addTodoClassName = "board-todo-list-item-add todo-list-add-active"
-        if (this.state.todoListAddTodoItem){
-            addTodoClassName+=""
+        let todoActionClassName =
+            "board-todo-list-item-actions rounded-2 p-3  handle-actions-click";
+        if (this.state.todoListShowActions) {
+            todoActionClassName += " list-item-actions-active";
         }
 
-        const todoItemsList = this.props.boardTodoListItems.todoItems
+        let addTodoClassName = "board-todo-list-item-add todo-list-add-active";
+        if (this.state.todoListAddTodoItem) {
+            addTodoClassName += "";
+        }
 
-        const result = todoItemsList
+        const todoItemsList =
+            this.props.boardTodoListItems[this.props.todo._id] || [];
 
-        console.log(result)
+        const todoItems = todoItemsList
+            .sort((a, b) => a.order - b.order)
+            .map((item, index) => {
+                return (
+                    <Draggable
+                        key={item._id}
+                        draggableId={item._id}
+                        index={item.order}
+                    >
+                        {(provided, snapshot) => (
+                            <li
+                                style={{
+                                    ...snapshot.isDragging,
+                                    ...provided.draggableProps.style,
+                                }}
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                            >
+                                <TodoListItem todoItem={item} />
+                            </li>
+                        )}
+                    </Draggable>
+                );
+            });
 
-        const todoItems = result.map((item, index) => {
-            return (
-                <Draggable key={item._id} draggableId={item._id} index={item.order}>
-                    {(provided, snapshot) => (
-                        <li style={{...snapshot.isDragging, ...provided.draggableProps.style}} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                            <TodoListItem todoItem={item} />
-                        </li>
-                    )}
-                </Draggable>
-            )
-        })
-
-        return(
-            <div draggable="false" className="board-todo-list-item shadow-sm p-3 d-flex flex-column">
+        return (
+            <div
+                draggable="false"
+                className="board-todo-list-item shadow-sm p-3 d-flex flex-column"
+            >
                 <div className="board-todo-list-item-header d-flex align-items-center">
                     <span>
-                        <input onKeyDown={this.onTodoNameChangeEnd}
-                               onBlur={this.onTodoNameChangeEnd}
-                               onChange={this.onTodoNameChange}
-                               value={this.state.todoListRename}
-                               className="board-todo-list-item-header-title"
-                               type="text"/>
+                        <input
+                            onKeyDown={this.onTodoNameChangeEnd}
+                            onBlur={this.onTodoNameChangeEnd}
+                            onChange={this.onTodoNameChange}
+                            value={this.state.todoListRename}
+                            className="board-todo-list-item-header-title"
+                            type="text"
+                        />
                     </span>
                     <div className="board-todo-list-item-controls d-flex">
-                        <div onClick={this.toggleCreateTodoList} className="todo-list-control">
-                            <i className="fas fa-plus"></i>
-                        </div>
-                        <div onClick={() => this.toggleTodoActions(true)} className="todo-list-control">
+                        <div
+                            onClick={() => {
+                                this.toggleTodoActions(
+                                    !this.state.todoListShowActions
+                                );
+                            }}
+                            ref={this.setWrapperRef}
+                            className="todo-list-control"
+                        >
                             <i className="fas fa-ellipsis-h"></i>
                         </div>
                     </div>
                 </div>
                 <Droppable droppableId={this.props.todo._id}>
                     {(provided, snapshot) => (
-                        <div ref={provided.innerRef} style={{...snapshot.isDraggingOver}} className="board-todo-list-item-content">
+                        <div
+                            ref={provided.innerRef}
+                            style={{ ...snapshot.isDraggingOver }}
+                            className="board-todo-list-item-content"
+                        >
                             <ul>
                                 {todoItems}
+                                {provided.placeholder}
                             </ul>
-                            {provided.placeholder}
                             <div draggable={false} className={addTodoClassName}>
-                            <textarea value={this.state.todoListAddTodoItemName}
-                                      ref={el => this.addTodoListItemEnd = el}
-                                  rows={this.state.newTodoNameRows}
-                                  onChange={this.onNewTodoNameChange}
-                                  placeholder="Todo name"
-                                  className="form-control mb-2 mt-2"
-                                  type="text" />
+                                <textarea
+                                    value={this.state.todoListAddTodoItemName}
+                                    rows={this.state.newTodoNameRows}
+                                    onChange={this.onNewTodoNameChange}
+                                    placeholder="Todo name"
+                                    className="form-control mb-2 mt-2"
+                                    type="text"
+                                />
                                 <div className="d-flex justify-content-between">
-                                    <div className="btn btn-dark w-100" onClick={this.createTodoListItem}>Save</div>
+                                    <div
+                                        className="btn btn-dark w-100"
+                                        onClick={this.createTodoListItem}
+                                    >
+                                        Save
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        )}
+                    )}
                 </Droppable>
-                <div ref={this.setWrapperRef} className={todoActionClassName}>
-                    <div className="board-todo-list-item-action">
-                        Copy list
-                    </div>
-                    <div className="board-todo-list-item-action">
-                        Delete items
-                    </div>
-                    <div onClick={this.onTodoDelete} className="board-todo-list-item-action">
-                        Delete list
-                    </div>
+                <div
+                    ref={this.setActionWrapperRef}
+                    className={todoActionClassName}
+                >
+                    <ComponentAction
+                        actionText="Copy list"
+                        actionIcon="far fa-copy"
+                        onClick={() =>
+                            this.props.copyTodoToCurrentBoard(
+                                this.props.todo._id
+                            )
+                        }
+                    />
+                    <ComponentAction
+                        actionText="Copy to board"
+                        actionIcon="fas fa-file-import"
+                    />
+                    <ComponentAction
+                        actionText="Clear list"
+                        actionIcon="fas fa-broom"
+                        onClick={() =>
+                            this.props.clearTodoList(this.props.todo._id)
+                        }
+                    />
+                    <ComponentAction
+                        actionText="Delete list"
+                        actionIcon="far fa-trash-alt"
+                        onClick={() =>
+                            this.props.deleteTodoBoard(this.props.todo._id)
+                        }
+                    />
                 </div>
             </div>
-        )
+        );
     }
 }
+
 const mapStateToProps = (state) => {
     return {
         userData: state.userState.userData,
         boardData: state.boardState.boardData,
         boardUsersData: state.boardState.boardUsersData,
-        boardTodoListItems: state.boardState.boardTodoListItems
-    }
-}
+        boardTodoListItems: state.boardState.boardTodoListItems,
+        boardIsSorted: state.boardState.boardIsSorted,
+        boardSearchValue: state.boardState.boardSearchValue,
+    };
+};
 
 const mapDispatchToProps = {
     deleteTodoBoard,
     updateTodoList,
     createTodoListItem,
-    getTodoListItems
-}
+    getTodoListItems,
+    deleteTodoItem,
+    copyTodoToCurrentBoard,
+    clearTodoList,
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(TodoList)
+export default connect(mapStateToProps, mapDispatchToProps)(TodoList);

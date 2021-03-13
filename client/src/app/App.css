@@ -10,7 +10,7 @@
     background: #6c757d  !important;
 }
 main{
-    width: 83%;
+    width: 100%;
     background: #ECECF0;
 }
 .opacity-0{
@@ -25,4 +25,11 @@ main{
 ::-webkit-scrollbar-thumb{
     background: #fff;
     border-radius: 5px;
+}
+#pointer{
+    position: absolute;
+    transition: .2s;
+    width: 3px;
+    height: 3px;
+    background: #000000;
 }

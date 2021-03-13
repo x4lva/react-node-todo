@@ -1,28 +1,32 @@
-import {UPDATE_BOARD_DATA} from "../types/BoardTypes";
-
+import { UPDATE_BOARD_DATA } from "../types/BoardTypes";
 
 const initialState = {
     boardData: {
-        _id: '',
-        name: '',
-        users: []
+        _id: "",
+        name: "",
+        users: [],
     },
     boardUsersData: [],
     boardAddMember: false,
-    boardAddMemberId: '',
+    boardAddMemberId: "",
     boardTodoCreate: false,
-    boardTodoCreateName: '',
+    boardTodoCreateName: "",
     boardTodoLists: [],
-    boardTodoListItems: []
-}
+    boardTodoListItems: [],
+    boardSearchValue: "",
+    boardSortedList: [],
+    boardIsSorted: false,
+    boardIsLoading: true,
+    boardChatShow: false,
+};
 
 const boardReducer = (state = initialState, action) => {
     switch (action.type) {
         case UPDATE_BOARD_DATA:
-            return {...state, ...action.payload}
+            return { ...state, ...action.payload };
         default:
-            return state
+            return state;
     }
-}
+};
 
-export default boardReducer
+export default boardReducer;

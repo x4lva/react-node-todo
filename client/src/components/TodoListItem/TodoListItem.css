@@ -1,0 +1,19 @@
+.todo-list-item-modal-container{
+    display: flex;
+    margin-bottom: 10px;
+}
+.todo-list-item-modal-icon{
+    margin-right: 15px;
+}
+.todo-item-modal .todo-list-item-modal-container:last-child{
+    margin-bottom: 0;
+}
+.todo-list-item-modal-content{
+    width: 100%;
+}
+.todo-list-item-modal-content textarea{
+    resize: horizontal;
+}
+.todo-list-item-modal-icon{
+    width: 20px;
+}

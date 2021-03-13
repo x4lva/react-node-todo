@@ -10,6 +10,7 @@
     --bs-purple: #6f42c1;
     --bs-pink: #d63384;
     --bs-red: #dc3545;
+    --bs-red: #dc3545;
     --bs-orange: #fd7e14;
     --bs-yellow: #ffc107;
     --bs-green: #198754;
@@ -2853,8 +2854,8 @@ fieldset:disabled .btn {
 }
 .btn-dark {
     color: #fff;
-    background-color: #212529;
-    border-color: #212529;
+    background-color: #000;
+    border-color: #000;
 }
 .btn-dark:hover {
     color: #fff;

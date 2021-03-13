@@ -11,5 +11,51 @@
 }
 .board-todo-list-item-header {
     font-size: 19px;
-    width: 235px;
+    width: 100%;
+}
+.board-back{
+    position: absolute;
+    top: 18px;
+    left: 15px;
+    display: flex;
+    width: 30px;
+    height: 30px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #fff;
+    background: #000;
+}
+.board-back a{
+    color: #fff;
+}
+.board-back a:hover{
+    color: #fff;
+    cursor: pointer;
+}
+.d-flex.justify-content-between.w-100 span {
+    font-weight: 600;
+    text-transform: capitalize;
+}
+.board-action-item:hover{
+    cursor: pointer;
+}
+.board-chat-toggle{
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    background: #000000;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    font-size: 18px;
+}
+.board-chat-header-name{
+    text-transform: uppercase;
+    font-weight: 600;
 }

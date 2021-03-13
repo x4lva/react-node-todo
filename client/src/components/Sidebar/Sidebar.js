@@ -1,18 +1,16 @@
-import React, {Component} from "react"
-import {NavLink, withRouter} from "react-router-dom";
-import "./Sidebar.css"
+import React, { Component } from "react";
+import { NavLink, withRouter } from "react-router-dom";
+import "./Sidebar.css";
 
-class Sidebar extends Component{
-
+class Sidebar extends Component {
     constructor(props) {
         super(props);
-
-        this.onLogout = this.onLogout.bind(this)
+        this.onLogout = this.onLogout.bind(this);
     }
 
-    onLogout(){
-        localStorage.removeItem('usertoken')
-        this.props.history.push(`/`)
+    onLogout() {
+        localStorage.removeItem("usertoken");
+        this.props.history.push(`/`);
         window.location.reload();
     }
 
@@ -23,39 +21,73 @@ class Sidebar extends Component{
                     <div></div>
                     <ul className="navbar-nav flex-column">
                         <li className="nav-item">
-                            <NavLink activeClassName={"text-white nav-item-current"} to={"/"} exact>
-                                <span><i className="fas fa-table"></i></span> Home
+                            <NavLink
+                                activeClassName={"text-white nav-item-current"}
+                                to={"/"}
+                                exact
+                            >
+                                <span>
+                                    <i className="fas fa-table"></i>
+                                </span>{" "}
+                                Home
                             </NavLink>
                         </li>
                         <li className="nav-item">
-                            <NavLink activeClassName={"text-white nav-item-current"} to={"/boards"}>
-                                <span><i className="fas fa-th-large"></i></span>  Board
+                            <NavLink
+                                activeClassName={"text-white nav-item-current"}
+                                to={"/boards"}
+                            >
+                                <span>
+                                    <i className="fas fa-th-large"></i>
+                                </span>{" "}
+                                Board
                             </NavLink>
                         </li>
                         <li className="nav-item">
-                            <NavLink activeClassName={"text-white nav-item-current"} to={"/calendar"}>
-                                <span><i className="fas fa-calendar-week"></i></span>  Calendar
+                            <NavLink
+                                activeClassName={"text-white nav-item-current"}
+                                to={"/calendar"}
+                            >
+                                <span>
+                                    <i className="fas fa-calendar-week"></i>
+                                </span>{" "}
+                                Calendar
                             </NavLink>
                         </li>
                         <li className="nav-item">
-                            <NavLink activeClassName={"text-white nav-item-current"} to={"/boards"}>
-                                <span><i className="fas fa-th-list"></i></span>  Todo
+                            <NavLink
+                                activeClassName={"text-white nav-item-current"}
+                                to={"/boards"}
+                            >
+                                <span>
+                                    <i className="fas fa-th-list"></i>
+                                </span>{" "}
+                                Todo
                             </NavLink>
                         </li>
                         <li className="nav-item">
-                            <NavLink activeClassName={"text-white nav-item-current"} to={"/reports"} exact>
-                                <span><i className="fas fa-boxes"></i></span>  Reports
+                            <NavLink
+                                activeClassName={"text-white nav-item-current"}
+                                to={"/reports"}
+                                exact
+                            >
+                                <span>
+                                    <i className="fas fa-boxes"></i>
+                                </span>{" "}
+                                Reports
                             </NavLink>
                         </li>
                     </ul>
-                    <div onClick={this.onLogout} className="m-3 rounded-2 sidebar-logout text-dark bg-white p-2 fw-bold text-uppercase d-flex justify-content-center align-items-center">
+                    <div
+                        onClick={this.onLogout}
+                        className="m-3 rounded-2 sidebar-logout text-dark bg-white p-2 fw-bold text-uppercase d-flex justify-content-center align-items-center"
+                    >
                         Logout
                     </div>
                 </div>
             </nav>
-        )
+        );
     }
-
 }
 
-export default withRouter(Sidebar)
+export default withRouter(Sidebar);

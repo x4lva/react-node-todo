@@ -1,0 +1,9 @@
+.user-board-card{
+    margin-bottom: 15px;
+}
+.user-board-card-name a{
+    color: #000000;
+    text-decoration: none;
+    width: 100%;
+    display: inline-block;
+}
