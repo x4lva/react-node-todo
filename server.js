@@ -35,30 +35,6 @@ server.listen(PORT, () => {
 });
 
 io.on("connection", (socket) => {
-    // socket.on("createTodo", (res) => {
-    //     io.emit("updateTodos", {
-    //         type: "TODO_CREATE",
-    //         user: res.user,
-    //         boardName: res.boardName,
-    //     });
-    // });
-    //
-    // socket.on("deleteTodo", (res) => {
-    //     io.emit("updateTodos", {
-    //         type: "TODO_DELETE",
-    //         user: res.user,
-    //         boardName: res.boardName,
-    //     });
-    // });
-    //
-    // socket.on("addUser", () => {
-    //     io.emit("updateUsers");
-    // });
-    //
-    // socket.on("todoChanged", () => {
-    //     io.emit("updateTodos", { type: "TODO_CHANGED" });
-    // });
-    //
     // socket.on("mouse-scroll", (res) => {
     //     socket.broadcast.emit("scrolled", { x: res.x, y: res.y });
     // });
@@ -68,16 +44,21 @@ io.on("connection", (socket) => {
     });
 
     socket.on("board-update", (res) => {
-        console.log(res);
         socket.in(res.boardId).emit("board-updated", res.userName);
     });
     socket.on("board-update-todos", (res) => {
-        console.log(res);
         socket.in(res.boardId).emit("board-updated-todos", res.userName);
     });
 
+    socket.on("board-message", (res) => {
+        socket.in(res.boardId).emit("board-send-message", res.message);
+    });
+
+    socket.on("board-user", (res) => {
+        socket.in(res).emit("board-updated-user");
+    });
+
     socket.on("board-disconnect", (res) => {
-        console.log("dis", res);
         socket.leave(res);
     });
 });

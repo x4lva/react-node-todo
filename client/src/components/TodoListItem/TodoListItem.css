@@ -17,3 +17,6 @@
 .todo-list-item-modal-icon{
     width: 20px;
 }
+.todo-list-item-modal-content textarea{
+    resize: none;
+}

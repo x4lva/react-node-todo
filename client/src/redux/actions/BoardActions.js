@@ -21,6 +21,10 @@ import {
     updateTodoItem,
 } from "../../services/TodoItemService";
 import socket from "../../utilities/OpenSocket";
+import {
+    createBoardMessage,
+    getBoardMessages,
+} from "../../services/BoardMessegeService";
 
 export const setBoardDataState = (payload) => {
     return {
@@ -55,6 +59,14 @@ export const getBoardState = (boardId) => async (dispatch, getState) => {
             );
         }
     );
+
+    getBoardMessages(boardId).then((res) => {
+        dispatch(
+            setBoardDataState({
+                boardMessages: res,
+            })
+        );
+    });
 
     dispatch(
         setBoardDataState({
@@ -107,11 +119,6 @@ export const updateBoardDataState = (boardData) => (dispatch, getState) => {
 export const addMemberToBoard = (userId, boardId) => (dispatch, getState) => {
     addUserBoard(userId, boardId).then((response) => {
         if (response.status === 200) {
-            dispatch(
-                setBoardDataState({
-                    boardData: { ...response.data.board },
-                })
-            );
             getBoardUsers(boardId).then((user) => {
                 dispatch(
                     setBoardDataState({
@@ -119,6 +126,7 @@ export const addMemberToBoard = (userId, boardId) => (dispatch, getState) => {
                     })
                 );
             });
+            socket.emit("board-user", getState().boardState.boardData._id);
             ToastsStore.success("User has been created");
         } else {
             ToastsStore.error(response.data.message);
@@ -507,10 +515,67 @@ export const boardUpdateTodos = () => (dispatch, getState) => {
     });
 };
 
-export const toggleBoardChat = () => (dispatch, getState) => {
+export const toggleBoardChat = (state) => (dispatch, getState) => {
     dispatch(
         setBoardDataState({
-            boardChatShow: !getState().boardState.boardChatShow,
+            boardChatShow: state,
         })
     );
+};
+
+export const boardMessageChangeText = (messageText) => (dispatch, getState) => {
+    dispatch(
+        setBoardDataState({
+            boardMessageText: messageText,
+        })
+    );
+};
+
+export const boardSendMessage = () => async (dispatch, getState) => {
+    await createBoardMessage(
+        getState().boardState.boardData._id,
+        getState().boardState.boardMessageText,
+        getState().userState.userData._id
+    ).then((res) => {
+        dispatch(
+            setBoardDataState({
+                boardMessages: [res, ...getState().boardState.boardMessages],
+            })
+        );
+        socket.emit("board-message", {
+            boardId: getState().boardState.boardData._id,
+            message: res,
+        });
+        return res;
+    });
+};
+
+export const boardMessageSended = (message) => (dispatch, getState) => {
+    dispatch(
+        setBoardDataState({
+            boardMessages: [message, ...getState().boardState.boardMessages],
+        })
+    );
+};
+
+export const updateBoardTodoListItem = (todoItemData) => (
+    dispatch,
+    getState
+) => {
+    updateTodoItem(todoItemData).then((res) => {
+        socket.emit("board-update-todos", {
+            boardId: getState().boardState.boardData._id,
+            userName: getState().userState.userData.name,
+        });
+    });
+};
+
+export const updateBoardUsers = () => (dispatch, getState) => {
+    getBoardUsers(getState().boardState.boardData._id).then((user) => {
+        dispatch(
+            setBoardDataState({
+                boardUsersData: user,
+            })
+        );
+    });
 };

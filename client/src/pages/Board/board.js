@@ -20,6 +20,7 @@ import {
     toggleBoardAddMember,
     toggleBoardChat,
     updateBoardDataState,
+    updateBoardUsers,
 } from "../../redux/actions/BoardActions";
 import BoardLoader from "../../components/BoardLoader/BoardLoader";
 import Skeleton from "react-loading-skeleton";
@@ -28,6 +29,7 @@ import { Link } from "react-router-dom";
 import socket from "../../utilities/OpenSocket";
 import { ToastsStore } from "react-toasts";
 import BoardChat from "../../components/BoardChat/BoardChat";
+import jwtDecode from "jwt-decode";
 
 class Board extends Component {
     constructor(props) {
@@ -36,6 +38,7 @@ class Board extends Component {
         this.state = {
             boardPermission: true,
             boardActionShow: false,
+            boardName: this.props.boardData.name,
         };
 
         this.onAddMemberIdChange = this.onAddMemberIdChange.bind(this);
@@ -65,12 +68,14 @@ class Board extends Component {
         this.props.getBoardState(this.props.match.params.id);
         socket.emit("board-connect", this.props.match.params.id);
         socket.on("board-updated", (res) => {
-            console.log(res);
             ToastsStore.success(`Board has been updated by ${res}`);
             this.props.boardUpdateTodos();
         });
         socket.on("board-updated-todos", (res) => {
             ToastsStore.success(`Board has been updated by ${res}`);
+        });
+        socket.on("board-updated-user", (res) => {
+            this.props.updateBoardUsers();
         });
     }
 
@@ -100,7 +105,12 @@ class Board extends Component {
             return <BoardLoader />;
         }
 
-        if (!this.props.userData.boards.includes(this.props.match.params.id)) {
+        if (
+            !this.props.boardData.users.includes(
+                jwtDecode(localStorage.usertoken)._id
+            ) &&
+            this.props.boardData.users.length !== 0
+        ) {
             return <BoardAccessError />;
         }
 
@@ -118,7 +128,7 @@ class Board extends Component {
                                 {this.props.boardData.name}
                             </h5>
                             <span className="ms-2 badge bg-secondary p-2">
-                                Sprint {this.props.boardData.users.length}
+                                Users {this.props.boardData.users.length}
                             </span>
                         </div>
                         <div className="board-header-info d-flex align-items-center">
@@ -204,16 +214,15 @@ class Board extends Component {
                         </div>
                     </div>
                 </Modal>
-                {this.props.boardChatShow ? (
-                    <BoardChat />
-                ) : (
-                    <div
-                        className="board-chat-toggle p-2"
-                        onClick={() => this.props.toggleBoardChat()}
-                    >
-                        <i className="fas fa-comments"></i>
-                    </div>
-                )}
+                <BoardChat />
+                <div
+                    className="board-chat-toggle board-chat-toggle-state p-2"
+                    onClick={() =>
+                        this.props.toggleBoardChat(!this.props.boardChatShow)
+                    }
+                >
+                    <i className="fas fa-comments board-chat-toggle-state"></i>
+                </div>
             </>
         );
     }
@@ -245,6 +254,7 @@ const mapDispatchToProps = {
     boardUpdateTodos,
     getTodoListItems,
     toggleBoardChat,
+    updateBoardUsers,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Board);

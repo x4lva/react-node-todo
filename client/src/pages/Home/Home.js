@@ -6,6 +6,8 @@ import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 
 import {
+    connectBoard,
+    connectBoardIdChange,
     createBoard,
     updateUserDataState,
 } from "../../redux/actions/UserActions";
@@ -19,13 +21,13 @@ class Home extends Component {
 
         this.state = {
             boardName: "",
-            connectBoardId: "",
         };
 
         this.createBoard = this.createBoard.bind(this);
         this.updateBoardName = this.updateBoardName.bind(this);
         this.connectBoard = this.connectBoard.bind(this);
         this.updateConnectBoardId = this.updateConnectBoardId.bind(this);
+        this.onLogout = this.onLogout.bind(this);
     }
 
     createBoard(e) {
@@ -40,19 +42,22 @@ class Home extends Component {
     }
 
     updateConnectBoardId(e) {
-        this.setState({
-            connectBoardId: e.target.value,
-        });
+        this.props.connectBoardIdChange(e.target.value);
     }
 
-    connectBoard() {
-        this.props.updateUserDataState({
-            boards: [...this.props.userData.boards, this.state.connectBoardId],
-        });
+    connectBoard(e) {
+        e.preventDefault();
+        this.props.connectBoard();
+    }
+    onLogout() {
+        localStorage.removeItem("usertoken");
+        this.props.history.push(`/`);
+        window.location.reload();
     }
 
     render() {
         const userBoards = this.props.userData.boards.map((el) => {
+            console.log(el);
             return (
                 <div style={{ width: "23%" }} key={el}>
                     <UserBoard board={el} />
@@ -62,30 +67,44 @@ class Home extends Component {
 
         return (
             <div className="container-fluid p-3 d-flex flex-column align-items-center">
-                <form className="d-flex" onSubmit={this.createBoard}>
-                    <input
-                        value={this.state.boardName}
-                        onChange={this.updateBoardName}
-                        type="text"
-                    />
-                    <button type="submit" className="btn btn-success">
-                        Create Board
-                    </button>
-                </form>
+                <div className="home-header col-11">
+                    <div className="home-header-actions">
+                        <form
+                            className="home-header-control d-flex"
+                            onSubmit={this.createBoard}
+                        >
+                            <input
+                                placeholder="Type board name"
+                                value={this.state.boardName}
+                                onChange={this.updateBoardName}
+                                className="form-control"
+                                type="text"
+                            />
+                            <button type="submit" className="btn btn-dark">
+                                Create Board
+                            </button>
+                        </form>
 
-                <input
-                    value={this.state.connectBoardId}
-                    onChange={this.updateConnectBoardId}
-                    type="text"
-                />
-                <div
-                    onClick={this.connectBoard}
-                    type="submit"
-                    className="btn btn-success"
-                >
-                    Connect Board
+                        <form
+                            className="home-header-control d-flex"
+                            onSubmit={this.connectBoard}
+                        >
+                            <input
+                                placeholder="Type board id"
+                                value={this.props.userConnectBoardId}
+                                onChange={this.updateConnectBoardId}
+                                className="form-control"
+                                type="text"
+                            />
+                            <div type="submit" className="btn btn-dark">
+                                Connect Board
+                            </div>
+                        </form>
+                    </div>
+                    <div onClick={this.onLogout} className="btn btn-dark">
+                        Logout
+                    </div>
                 </div>
-
                 <div className="col-11 d-flex justify-content-center flex-wrap justify-content-between">
                     {userBoards}
                 </div>
@@ -95,12 +114,17 @@ class Home extends Component {
 }
 
 const mapStateToProps = (state) => {
-    return { userData: state.userState.userData };
+    return {
+        userData: state.userState.userData,
+        userConnectBoardId: state.userState.userConnectBoardId,
+    };
 };
 
 const mapDispatchToProps = {
     updateUserDataState,
     updateBoardDataState,
+    connectBoard,
+    connectBoardIdChange,
     createBoard,
 };
 

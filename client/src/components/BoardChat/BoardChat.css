@@ -1,7 +1,7 @@
 .board-chat{
     position: absolute;
     right: 15px;
-    bottom: 15px;
+    bottom: 65px;
     background: #000000;
     width: 300px;
     height: 450px;
@@ -11,6 +11,18 @@
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
+    animation: .2s linear chatAnimation;
+}
+
+@keyframes chatAnimation {
+    0%{
+        opacity: 0;
+        bottom: 40px;
+    }
+    100%{
+        opacity: 1;
+        bottom: 65px;
+    }
 }
 .board-chat-controls{
     display: flex;
@@ -38,6 +50,9 @@
     overflow-y: auto;
     flex-direction: column;
     justify-content: flex-end;
+    overflow-x: hidden;
+    width: 100%;
+    border-radius: 4px;
 }
 .board-message-container{
     display: flex;
@@ -47,9 +62,11 @@
     background: #fff;
     border-radius: 3px;
     position: relative;
+    min-width: 85%;
 }
 .board-chat-current-message-content{
     text-align: justify;
+    overflow-wrap: anywhere;
 }
 .board-chat-current-message-header{
     display: flex;
@@ -65,7 +82,7 @@
 .board-chat-another-message .board-message-container{
     background: #000;
     color: #fff;
-    border: 3px solid #fff;
+    border-left: 3px solid #fff;
     border-radius: 4px;
 }
 .board-chat-header{

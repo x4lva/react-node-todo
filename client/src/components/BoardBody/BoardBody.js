@@ -159,9 +159,6 @@ class BoardBody extends Component {
                         >
                             New List
                         </div>
-                        <div className="btn bg-white border-1 shadow-sm">
-                            <i className="fas fa-sort pe-1"></i> Filter
-                        </div>
                     </div>
                 </div>
                 <ScrollContainer

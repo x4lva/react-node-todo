@@ -1,0 +1,24 @@
+.home-header{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 15px;
+}
+.home-header .home-header-control{
+    margin-right: 15px;
+}
+.home-header .home-header-control input{
+    width: auto;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.home-header .home-header-control .btn{
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.home-header .home-header-actions{
+    display: flex;
+}
+.user-board-card-name a:hover{
+    color: #000000;
+}

@@ -113,11 +113,15 @@ class TodoList extends Component {
     }
 
     handleClickOutside(e) {
-        if (
-            !this.wrapperRef.contains(e.target) &&
-            !this.actionRef.contains(e.target)
-        ) {
-            this.toggleTodoActions(false);
+        try {
+            if (
+                !this.wrapperRef.contains(e.target) &&
+                !this.actionRef.contains(e.target)
+            ) {
+                this.toggleTodoActions(false);
+            }
+        } catch (err) {
+            console.log(err);
         }
     }
 
@@ -176,7 +180,10 @@ class TodoList extends Component {
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                             >
-                                <TodoListItem todoItem={item} />
+                                <TodoListItem
+                                    todoId={this.props.todo._id}
+                                    todoItem={item}
+                                />
                             </li>
                         )}
                     </Draggable>

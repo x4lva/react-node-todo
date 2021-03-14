@@ -73,3 +73,18 @@ export const UserLeaveBoard = async (userId, boardId) => {
             console.log(err);
         });
 };
+
+export const userConnectBoard = async (userId, boardId) => {
+    return await axios
+        .post("http://localhost:3000/user/update/board", {
+            userId,
+            boardId,
+        })
+        .then((response) => {
+            console.log(response);
+            return response;
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+};

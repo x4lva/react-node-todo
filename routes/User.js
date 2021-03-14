@@ -99,10 +99,13 @@ user.post("/update/board", (req, res) => {
 
     console.log(userId, boardId);
 
-    if (mongoose.Types.ObjectId.isValid(userId)) {
+    if (
+        mongoose.Types.ObjectId.isValid(userId) &&
+        mongoose.Types.ObjectId.isValid(boardId)
+    ) {
         User.findByIdAndUpdate(
-            { _id: mongoose.Types.ObjectId(userId) },
-            { $addToSet: { boards: boardId } },
+            { _id: userId },
+            { $addToSet: { boards: mongoose.Types.ObjectId(boardId) } },
             { new: true }
         )
             .then((user) => {
@@ -112,14 +115,17 @@ user.post("/update/board", (req, res) => {
                     { new: true }
                 )
                     .then((board) => {
-                        res.json({ user, board, status: 200 });
+                        res.status(200).json({
+                            boardId: board._id,
+                            status: 200,
+                        });
                     })
                     .catch((err) => {
-                        res.status(501).json({ message: err });
+                        res.json({ message: err, status: 501 });
                     });
             })
             .catch((err) => {
-                res.status(501).json({ message: err });
+                res.json({ message: err, status: 501 });
             });
     } else {
         res.json({ message: "User id is not valid", status: 501 });

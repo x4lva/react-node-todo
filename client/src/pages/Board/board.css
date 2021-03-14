@@ -2,8 +2,8 @@
     background: #F8F9FA;
     min-height: 66px;
 }
-.board-header .board-header-title h5{
-    margin-bottom: 3px !important;
+.board-header .board-header-title h5 {
+    margin-bottom: 0 !important;
 }
 .vertical-dec{
     width: 1px;

@@ -14,7 +14,7 @@ boardMessage.post("/create", async (req, res) => {
     };
 
     BoardMessage.create(messageData).then((response) => {
-        res.status(200);
+        res.status(200).json(response);
     });
 });
 
@@ -23,6 +23,7 @@ boardMessage.post("/get", async (req, res) => {
 
     BoardMessage.find({ board: boardId })
         .limit(50)
+        .sort({ _id: -1 })
         .then((response) => {
             res.status(200).json(response);
         });

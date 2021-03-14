@@ -18,6 +18,8 @@ const initialState = {
     boardIsSorted: false,
     boardIsLoading: true,
     boardChatShow: false,
+    boardMessageText: "",
+    boardMessages: [],
 };
 
 const boardReducer = (state = initialState, action) => {

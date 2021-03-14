@@ -4,7 +4,7 @@ export const createNewBoard = async (boardName, userId) => {
     return await axios
         .post("http://localhost:3000/board/create", { boardName, userId })
         .then((response) => {
-            console.log(response.data.status);
+            return response.data;
         })
         .catch((e) => {
             console.log(e);

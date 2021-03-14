@@ -15,15 +15,15 @@ board.post("/create", async (req, res) => {
         users: [mongoose.Types.ObjectId(req.body.userId)],
     };
 
-    console.log(boardData);
-
     Board.create(boardData)
         .then(async (board) => {
             await User.findByIdAndUpdate(
-                { _id: mongoose.Types.ObjectId(req.body.userId) },
-                { $addToSet: { boards: board._id } },
+                { _id: req.body.userId },
+                { $addToSet: { boards: mongoose.Types.ObjectId(board._id) } },
                 { new: true }
             ).exec();
+            console.log(board);
+            res.status(200).json(board);
         })
         .catch((err) => {
             console.log(err);
@@ -32,8 +32,10 @@ board.post("/create", async (req, res) => {
 });
 
 board.get("/data/:id", (req, res) => {
-    Board.findById(req.params.id)
+    console.log(req.params._id);
+    Board.findById({ _id: mongoose.Types.ObjectId(req.params.id) })
         .then((board) => {
+            console.log(board);
             res.json(board);
         })
         .catch((err) => {
@@ -97,11 +99,7 @@ board.post("/get/users", (req, res) => {
 board.post("/update", (req, res) => {
     let { boardData } = req.body;
 
-    Board.findByIdAndUpdate(
-        boardData._id,
-        { $addToSet: { users: boardData.users }, ...boardData },
-        { new: true }
-    )
+    Board.findByIdAndUpdate({ _id: boardData._id }, boardData, { new: true })
         .then((board) => {
             res.status(200).json(board);
         })
