@@ -101,16 +101,14 @@ class Board extends Component {
     }
 
     render() {
-        if (this.props.boardData._id !== this.props.match.params.id) {
+        if (
+            this.props.boardData._id !== this.props.match.params.id ||
+            this.props.userData._id === ""
+        ) {
             return <BoardLoader />;
         }
 
-        if (
-            !this.props.boardData.users.includes(
-                jwtDecode(localStorage.usertoken)._id
-            ) &&
-            this.props.boardData.users.length !== 0
-        ) {
+        if (!this.props.userData.boards.includes(this.props.match.params.id)) {
             return <BoardAccessError />;
         }
 
