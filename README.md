@@ -1,6 +1,9 @@
 # React Board
 
-React Board is a web-based, list-making application written in React.JS
+React Board is a web-based, list-making application written in React.JS </br>
+Application use WebSockets for async using.
+
+[Video Presentation](https://watch.screencastify.com/v/7YLA171oLFQAZ1qiYDml)
 
 # Tech
 
@@ -30,6 +33,12 @@ cd react-node-todo
 npm i
 npm run start
 ```
+
+# Screenshots
+Main Page
+![Main Page](https://i2.paste.pics/d87b9d877b23d801ca77b2b941e012be.png?trs=0d0cf50bc4c62e190d6991da570e9068e5085e1ab1c1165d4d32b0fb1d9b8509)
+Board Page
+![Board Page](https://i2.paste.pics/9e4da5323ade6827b184cc008320f54d.png?trs=0d0cf50bc4c62e190d6991da570e9068e5085e1ab1c1165d4d32b0fb1d9b8509)
 
 [node.js]: http://nodejs.org
 [express]: http://expressjs.com
