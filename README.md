@@ -17,7 +17,7 @@ App uses a number of open source projects to work properly:
 
 ## Installation
 
-1. The server use Mysql, so you need to install [Node.JS]
+1. The server use Node.JS, so you need to install [Node.JS]
 2. The server is written in [Node.JS] v14+, so you need to install [Node.JS]
 3. Create new database in MongoDB
 4. Clone repository in your directory
